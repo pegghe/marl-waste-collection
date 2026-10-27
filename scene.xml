@@ -1,0 +1,28 @@
+<mujoco model="waste_collection">
+  <option timestep="0.01" gravity="0 0 -9.81"/>
+  <visual>
+    <global offwidth="640" offheight="480"/>
+  </visual>
+  <worldbody>
+    <light pos="0 0 5" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="3 3 0.1" rgba="0.2 0.25 0.3 1"/>
+    <body name="robot" pos="0 0 0.16">
+      <joint name="x" type="slide" axis="1 0 0" limited="true" range="-2.5 2.5" damping="2"/>
+      <joint name="y" type="slide" axis="0 1 0" limited="true" range="-2.5 2.5" damping="2"/>
+      <geom name="robot_body" type="cylinder" size="0.18 0.15" mass="1" rgba="0.1 0.5 0.95 1"/>
+      <site name="heading" pos="0.14 0 0.16" size="0.04" rgba="1 1 1 1"/>
+    </body>
+    <body name="target" pos="1 1 0.095" quat="0.7071 0 0.7071 0">
+      <!-- A plastic bottle lying on its side; visual only. -->
+      <geom type="cylinder" size="0.09 0.16" rgba="0.65 0.88 0.95 0.65" contype="0" conaffinity="0"/>
+      <geom type="ellipsoid" pos="0 0 0.15" size="0.09 0.09 0.07" rgba="0.65 0.88 0.95 0.65" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="0 0 0.23" size="0.04 0.06" rgba="0.65 0.88 0.95 0.65" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="0 0 0.305" size="0.047 0.025" rgba="0.1 0.3 0.85 1" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="0 0 -0.025" size="0.092 0.065" rgba="0.1 0.5 0.8 1" contype="0" conaffinity="0"/>
+    </body>
+  </worldbody>
+  <actuator>
+    <motor name="move_x" joint="x" ctrllimited="true" ctrlrange="-1 1" gear="1"/>
+    <motor name="move_y" joint="y" ctrllimited="true" ctrlrange="-1 1" gear="1"/>
+  </actuator>
+</mujoco>
