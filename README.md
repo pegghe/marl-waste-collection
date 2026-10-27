@@ -17,7 +17,11 @@ python train.py
 python evaluate.py --render
 ```
 
-Training uses four environments for approximately 600,000 steps and saves
+Run these commands from this project directory. Installation expects the professor's
+library at `../Multiagents/masb3` and installs it in editable mode.
+
+Training uses MASB3's `ma_train` and `MultiAgentSharedVecEnv` with one robot
+in one simulation for approximately 600,000 steps and saves
 `models/ppo_go/final_model.zip`. Evaluation loads this policy.
 For evaluation without a window: `python evaluate.py --episodes 100`.
 
@@ -25,8 +29,16 @@ For evaluation without a window: `python evaluate.py --episodes 100`.
 
 - `waste_collection_env.py`: random spawning, observations, rewards, and episode logic.
 - `scene.xml`: robot, floor, target, and motors.
-- `train.py`: PPO training with reward normalization.
+- `robot_ma_env.py`: adapts the MuJoCo environment to MASB3's `BaseMAEnv` interface.
+- `train.py`: MASB3 training with SB3 PPO and reward normalization.
 - `evaluate.py`: run the learned policy.
+
+MASB3 comes from `Multiagents/masb3`. The environments in
+`Multiagents/masb3-experiments` serve as examples; they are not required here.
+PPO collects 2,048 steps per rollout with this single learning agent.
+Observations, rewards, and the 400-step episode limit are unchanged.
+Existing SB3 PPO checkpoints remain compatible because observations and actions
+are unchanged. MASB3 also writes training checkpoints under `checkpoints/`.
 
 ## Observation and actions
 
@@ -37,7 +49,7 @@ Actions: two motor commands in `[-1, 1]`, along X and Y.
 
 - Step penalty: `-0.01` at every step.
 - With `go=1`: subtract the distance to the target.
-- With `go=0`: subtract the robot's speed to encourage waiting.
+- With `go=0`: subtract the robot's speed and `5 * distance_from_start` to encourage waiting.
 - On success: add `10`.
 
 Existing checkpoints were trained with the previous reward. Run `python train.py`

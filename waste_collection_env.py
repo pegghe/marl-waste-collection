@@ -40,6 +40,7 @@ class WasteCollectionEnv(MujocoEnv):
 
         qpos = self.init_qpos.copy()
         qpos[:2] = self.np_random.uniform(-2, 2, size=2)
+        self.start_position = qpos[:2].copy()
         self.target = self.np_random.uniform(-2, 2, size=2)
         while np.linalg.norm(self.target - qpos[:2]) < 0.75:
             self.target = self.np_random.uniform(-2, 2, size=2)
@@ -60,6 +61,7 @@ class WasteCollectionEnv(MujocoEnv):
             reward -= distance
         else:
             reward -= np.linalg.norm(self.data.qvel[:2])
+            reward -= 5 * np.linalg.norm(self.data.qpos[:2] - self.start_position)
         if success:
             reward += 10
 
