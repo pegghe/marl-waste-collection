@@ -27,9 +27,9 @@ For evaluation without a window: `python robot_experiment.py evaluate --episodes
 
 ## Files
 
-- `waste_collection_env.py`: random spawning, observations, rewards, and episode logic.
+- `waste_collection_env.py`: MuJoCo simulation (`WasteCollectionEnv`) and MASB3
+  interface (`RobotMAEnv`), including spawning, observations, rewards, and episodes.
 - `scene.xml`: robot, floor, target, and motors.
-- `robot_ma_env.py`: adapts the MuJoCo environment to MASB3's `BaseMAEnv` interface.
 - `robot_experiment.py`: `RobotExperiment` class with `train()` and `evaluate()`,
   using MASB3's `ma_train` and `ma_evaluate`.
 

@@ -8,7 +8,7 @@ from masb3.base import MultiAgentSharedVecEnv
 from masb3.utils import ma_evaluate, ma_train
 from stable_baselines3.common.vec_env import VecMonitor, VecNormalize
 
-from robot_ma_env import RobotMAEnv
+from waste_collection_env import RobotMAEnv
 
 
 class RobotExperiment:
