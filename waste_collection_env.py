@@ -20,9 +20,9 @@ class WasteCollectionEnv(MujocoEnv):
             frame_skip=5,
             observation_space=spaces.Box(-np.inf, np.inf, shape=(7,), dtype=np.float64),
             render_mode=render_mode,
-            default_camera_config={"distance": 8.0, "elevation": -90.0},
+            default_camera_config={"distance": 16.0, "elevation": -90.0},
         )
-        self.max_steps = 400
+        self.max_steps = 800
         self.success_radius = 0.25
 
     def _get_obs(self):
@@ -40,11 +40,11 @@ class WasteCollectionEnv(MujocoEnv):
         self.go = int(self.go_delay == 0)
 
         qpos = self.init_qpos.copy()
-        qpos[:2] = self.np_random.uniform(-2, 2, size=2)
+        qpos[:2] = self.np_random.uniform(-4, 4, size=2)
         self.start_position = qpos[:2].copy()
-        self.target = self.np_random.uniform(-2, 2, size=2)
+        self.target = self.np_random.uniform(-4, 4, size=2)
         while np.linalg.norm(self.target - qpos[:2]) < 0.75:
-            self.target = self.np_random.uniform(-2, 2, size=2)
+            self.target = self.np_random.uniform(-4, 4, size=2)
 
         self.model.body("target").pos[:2] = self.target
         self.set_state(qpos, self.init_qvel.copy())
