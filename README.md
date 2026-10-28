@@ -13,8 +13,8 @@ There is no drone in this version.
 
 ```bash
 pip install -r requirements.txt
-python train.py
-python evaluate.py --render
+python robot_experiment.py train
+python robot_experiment.py evaluate --render
 ```
 
 Run these commands from this project directory. Installation expects the professor's
@@ -23,15 +23,15 @@ library at `../Multiagents/masb3` and installs it in editable mode.
 Training uses MASB3's `ma_train` and `MultiAgentSharedVecEnv` with one robot
 in one simulation for approximately 600,000 steps and saves
 `models/ppo_go/final_model.zip`. Evaluation loads this policy.
-For evaluation without a window: `python evaluate.py --episodes 100`.
+For evaluation without a window: `python robot_experiment.py evaluate --episodes 100`.
 
 ## Files
 
 - `waste_collection_env.py`: random spawning, observations, rewards, and episode logic.
 - `scene.xml`: robot, floor, target, and motors.
 - `robot_ma_env.py`: adapts the MuJoCo environment to MASB3's `BaseMAEnv` interface.
-- `train.py`: MASB3 training with SB3 PPO and reward normalization.
-- `evaluate.py`: run the learned policy.
+- `robot_experiment.py`: `RobotExperiment` class with `train()` and `evaluate()`,
+  using MASB3's `ma_train` and `ma_evaluate`.
 
 MASB3 comes from `Multiagents/masb3`. The environments in
 `Multiagents/masb3-experiments` serve as examples; they are not required here.
@@ -52,7 +52,7 @@ Actions: two motor commands in `[-1, 1]`, along X and Y.
 - With `go=0`: subtract the robot's speed and `5 * distance_from_start` to encourage waiting.
 - On success: add `10`.
 
-Existing checkpoints were trained with the previous reward. Run `python train.py`
+Existing checkpoints were trained with the previous reward. Run `python robot_experiment.py train`
 to train a new policy with this reward.
 
 Success means `go=1` and distance to the target ≤ 0.25 m.
