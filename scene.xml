@@ -4,6 +4,7 @@
     <global offwidth="640" offheight="480"/>
   </visual>
   <asset>
+    <texture name="sky" type="skybox" builtin="flat" rgb1="0.45 0.72 0.95" rgb2="0.45 0.72 0.95" width="512" height="3072"/>
     <material name="grass" rgba="0.18 0.38 0.12 1" emission="1" specular="0" reflectance="0"/>
   </asset>
   <worldbody>
@@ -22,6 +23,22 @@
       <geom type="cylinder" pos="0 0 0.23" size="0.04 0.06" rgba="0.95 0.95 0.95 1" contype="0" conaffinity="0"/>
       <geom type="cylinder" pos="0 0 0.305" size="0.047 0.025" rgba="1 0.25 0.03 1" contype="0" conaffinity="0"/>
       <geom type="cylinder" pos="0 0 -0.025" size="0.092 0.065" rgba="1 0.25 0.03 1" contype="0" conaffinity="0"/>
+    </body>
+    <body name="drone" mocap="true" pos="0 0 3">
+      <geom type="box" size="0.09 0.09 0.035" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="-0.15 -0.15 0" size="0.08 0.0075" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="-0.15 0.15 0" size="0.08 0.0075" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="0.15 -0.15 0" size="0.08 0.0075" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>
+      <geom type="cylinder" pos="0.15 0.15 0" size="0.08 0.0075" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>
+      <body name="drone_sensor_0" pos="0 0 -0.04" quat="0.634486210246 0 0.75752803976 -0.153552981033"/>
+      <body name="drone_sensor_1" pos="0 0 -0.04" quat="0.632984033055 0 0.774164849304 0"/>
+      <body name="drone_sensor_2" pos="0 0 -0.04" quat="0.634486210246 0 0.75752803976 0.153552981033"/>
+      <body name="drone_sensor_3" pos="0 0 -0.04" quat="0.707106781187 0 0.693012712648 -0.140475549861"/>
+      <body name="drone_sensor_4" pos="0 0 -0.04" quat="0.707106781187 0 0.707106781187 0"/>
+      <body name="drone_sensor_5" pos="0 0 -0.04" quat="0.707106781187 0 0.693012712648 0.140475549861"/>
+      <body name="drone_sensor_6" pos="0 0 -0.04" quat="0.772934181549 0 0.621839616589 -0.12604857093"/>
+      <body name="drone_sensor_7" pos="0 0 -0.04" quat="0.774164849304 0 0.632984033055 0"/>
+      <body name="drone_sensor_8" pos="0 0 -0.04" quat="0.772934181549 0 0.621839616589 0.12604857093"/>
     </body>
   </worldbody>
   <actuator>

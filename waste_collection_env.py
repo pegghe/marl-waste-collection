@@ -1,4 +1,4 @@
-"""A robot learns to wait for a go signal and reach a random target."""
+"""Shared MuJoCo simulation and MASB3 coordination for robot and drone."""
 
 from pathlib import Path
 
@@ -7,6 +7,8 @@ from gymnasium import spaces
 from gymnasium.envs.mujoco import MujocoEnv
 from masb3.base import BaseMAEnv
 
+from agents import DroneAgent, RobotAgent
+
 
 class WasteCollectionEnv(MujocoEnv):
     metadata = {
@@ -14,92 +16,122 @@ class WasteCollectionEnv(MujocoEnv):
         "render_fps": 20,
     }
 
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, drone_training=False):
+        self.drone_training = drone_training
         super().__init__(
             model_path=str(Path(__file__).with_name("scene.xml")),
             frame_skip=5,
             observation_space=spaces.Box(-np.inf, np.inf, shape=(7,), dtype=np.float64),
             render_mode=render_mode,
-            default_camera_config={"distance": 16.0, "elevation": -90.0},
+            default_camera_config={
+                "distance": 16.0, "elevation": -35.0, "azimuth": 135.0,
+                "lookat": np.array([0.0, 0.0, 1.0]),
+            },
         )
-        self.max_steps = 800
-        self.success_radius = 0.25
+        self.max_steps = 2000
+        self.robot = RobotAgent(self)
+        self.drone = DroneAgent(self)
+        self.drone_action_space = self.drone.action_space
+        self.drone_observation_space = self.drone.observation_space
+
+    @property
+    def drone_reward(self):
+        return self.drone.reward
+
+    def get_drone_observation(self):
+        return self.drone.get_observation()
+
+    def reset(self, *, seed=None, options=None):
+        obs, info = super().reset(seed=seed, options=options)
+        info["drone_observation"] = self.get_drone_observation()
+        return obs, info
+
+    def render(self):
+        viewer = self.mujoco_renderer._get_viewer(self.render_mode)
+        self.drone.render_rays(viewer)
+        return super().render()
 
     def _get_obs(self):
-        # Position, velocity, relative target coordinates, go signal.
-        return np.concatenate((
-            self.data.qpos[:2],
-            self.data.qvel[:2],
-            self.target - self.data.qpos[:2],
-            [self.go],
-        ))
+        return self.robot.get_observation()
 
     def reset_model(self):
         self.steps = 0
-        self.go_delay = self.np_random.integers(0, 101)
-        self.go = int(self.go_delay == 0)
-
-        qpos = self.init_qpos.copy()
-        qpos[:2] = self.np_random.uniform(-4, 4, size=2)
-        self.start_position = qpos[:2].copy()
-        self.target = self.np_random.uniform(-4, 4, size=2)
-        while np.linalg.norm(self.target - qpos[:2]) < 0.75:
-            self.target = self.np_random.uniform(-4, 4, size=2)
-
+        qpos = self.robot.reset()
         self.model.body("target").pos[:2] = self.target
+        self.drone.reset_position(randomize=self.drone_training)
         self.set_state(qpos, self.init_qvel.copy())
+        self.shared_comm = np.zeros(3, dtype=np.float32)
+        self.drone.reset()
         return self._get_obs()
 
+    def move_drone(self, action):
+        self.drone.apply_action(action)
+
     def step(self, action):
-        action = np.clip(action, -1, 1)
-        self.do_simulation(action, self.frame_skip)
+        self.robot.apply_action(action)
         self.steps += 1
-
-        distance = float(np.linalg.norm(self.target - self.data.qpos[:2]))
-        success = bool(self.go and distance <= self.success_radius)
-        reward = -0.01  # Step penalty.
-        if self.go:
-            reward -= distance
-        else:
-            reward -= np.linalg.norm(self.data.qvel[:2])
-            reward -= 5 * np.linalg.norm(self.data.qpos[:2] - self.start_position)
-        if success:
-            reward += 10
-
-        # The next action receives go=1 once the waiting period is over.
-        self.go = int(self.steps >= self.go_delay)
+        reward, success, distance = self.robot.compute_reward()
+        self.drone.update_rays()
+        self.drone.compute_reward()
         if self.render_mode == "human":
             self.render()
 
-        info = {"distance": distance, "is_success": success}
-        return self._get_obs(), float(reward), success, self.steps >= self.max_steps, info
+        info = {
+            "distance": distance, "is_success": success,
+            "drone_ray_distances": self.drone.ray_distances.copy(),
+            "drone_ray_geomids": self.drone.ray_geomids.copy(),
+            "drone_reward": self.drone.reward,
+            "drone_reward_components": self.drone.reward_components.copy(),
+            "drone_found_target": bool(self.shared_comm[0]),
+            "drone_observation": self.get_drone_observation(),
+        }
+        terminated = bool(self.shared_comm[0]) if self.drone_training else success
+        info["is_success"] = terminated
+        truncated = self.steps >= self.max_steps and not terminated
+        return self._get_obs(), float(reward), terminated, truncated, info
 
 
 class RobotMAEnv(BaseMAEnv):
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, drone_training=False):
         super().__init__()
-        self.env = WasteCollectionEnv(render_mode=render_mode)
+        self.drone_training = drone_training
+        self.episode_successes = []
+        self.env = WasteCollectionEnv(render_mode=render_mode, drone_training=drone_training)
         self.register_agent("robot", self.env.observation_space, self.env.action_space)
+        if drone_training:
+            self.register_agent("drone", self.env.drone_observation_space, self.env.drone_action_space)
 
     def reset(self, seed=None):
         obs, info = self.env.reset(seed=seed)
         self.observation = obs
-        self.previous_observation = {"robot": obs}
-        return {"robot": obs}, info
+        self.previous_observation = self.get_observations()
+        return self.previous_observation, info
 
     def step_agent(self, agent_id, action):
-        self.action = action
+        if agent_id == "drone":
+            self.drone_action = action
+        else:
+            self.action = action
 
     def sync_wait_for_actions_completion(self):
+        if self.drone_training:
+            self.env.move_drone(self.drone_action)
         self.observation, self.reward, self.terminated, self.truncated, self.info = (
             self.env.step(self.action)
         )
+        if self.terminated or self.truncated:
+            self.episode_successes.append(bool(self.info["is_success"]))
 
     def get_observation(self, agent_id):
+        if agent_id == "drone":
+            return self.env.get_drone_observation()
         return self.observation
 
     def evaluate_env_state(self):
-        return {"robot": self.reward}, self.terminated, self.truncated, self.info
+        rewards = {"robot": self.reward}
+        if self.drone_training:
+            rewards["drone"] = self.env.drone_reward
+        return rewards, self.terminated, self.truncated, self.info
 
     def close(self):
         self.env.close()

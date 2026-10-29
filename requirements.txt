@@ -4,3 +4,4 @@ stable-baselines3>=2.9,<3
 -e ../Multiagents/masb3
 tqdm
 rich
+tensorboard
