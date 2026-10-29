@@ -16,18 +16,21 @@ class WasteCollectionEnv(MujocoEnv):
         "render_fps": 20,
     }
 
-    def __init__(self, render_mode=None, drone_training=False):
+    def __init__(self, render_mode=None, drone_training=False, finish_on_discovery=None):
         self.drone_training = drone_training
+        self.finish_on_discovery = drone_training if finish_on_discovery is None else finish_on_discovery
         super().__init__(
             model_path=str(Path(__file__).with_name("scene.xml")),
             frame_skip=5,
             observation_space=spaces.Box(-np.inf, np.inf, shape=(7,), dtype=np.float64),
             render_mode=render_mode,
             default_camera_config={
-                "distance": 16.0, "elevation": -35.0, "azimuth": 135.0,
+                "distance": 12.0, "elevation": -35.0, "azimuth": 135.0,
                 "lookat": np.array([0.0, 0.0, 1.0]),
             },
         )
+        self.area_half_size = 3.5
+        self.spawn_half_size = 3.0
         self.max_steps = 2000
         self.robot = RobotAgent(self)
         self.drone = DroneAgent(self)
@@ -85,18 +88,21 @@ class WasteCollectionEnv(MujocoEnv):
             "drone_found_target": bool(self.shared_comm[0]),
             "drone_observation": self.get_drone_observation(),
         }
-        terminated = bool(self.shared_comm[0]) if self.drone_training else success
+        terminated = bool(self.shared_comm[0]) if self.finish_on_discovery else success
         info["is_success"] = terminated
         truncated = self.steps >= self.max_steps and not terminated
         return self._get_obs(), float(reward), terminated, truncated, info
 
 
 class RobotMAEnv(BaseMAEnv):
-    def __init__(self, render_mode=None, drone_training=False):
+    def __init__(self, render_mode=None, drone_training=False, finish_on_discovery=None):
         super().__init__()
         self.drone_training = drone_training
         self.episode_successes = []
-        self.env = WasteCollectionEnv(render_mode=render_mode, drone_training=drone_training)
+        self.env = WasteCollectionEnv(
+            render_mode=render_mode, drone_training=drone_training,
+            finish_on_discovery=finish_on_discovery,
+        )
         self.register_agent("robot", self.env.observation_space, self.env.action_space)
         if drone_training:
             self.register_agent("drone", self.env.drone_observation_space, self.env.drone_action_space)

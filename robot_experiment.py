@@ -200,7 +200,10 @@ class RobotExperiment:
         models = {"robot": robot_model}
         if agent == "drone":
             models["drone"] = get_algo("sb3", "PPO").load(checkpoint, device="cpu")
-        env = RobotMAEnv(render_mode="human" if render else None, drone_training=agent == "drone")
+        env = RobotMAEnv(
+            render_mode="human" if render else None, drone_training=agent == "drone",
+            finish_on_discovery=False,
+        )
         try:
             avg_agent, avg_model = ma_evaluate(
                 env, models, total_episodes=episodes, verbose=True,

@@ -2,9 +2,10 @@
 
 A single robot learns to reach a target using PPO and MuJoCo.
 The target is a plastic bottle lying on the floor, drawn with simple MuJoCo shapes.
-Robot and target spawn randomly in an 8 × 8 m square at each reset, at least 0.75 m apart.
-The displayed floor is 12 × 12 m, with robot joint limits of ±5 m on both axes.
-The robot knows the target coordinates from the beginning.
+Robot and target spawn randomly in an 6 × 6 m square at each reset, at least 0.75 m apart.
+The displayed floor is 8 × 8 m, with robot joint limits of ±3.5 m on both axes.
+In robot-only training the robot knows the target coordinates from the beginning.
+With the drone active, target coordinates stay hidden until the drone detects it.
 
 The `go` signal starts at 0 for a random waiting period of 0–100 steps,
 then becomes 1. The robot learns to wait with `go=0` and move with `go=1`.
@@ -99,8 +100,8 @@ python robot_experiment.py evaluate --agent drone --render
 The saved robot policy at `models/ppo_go/final_model.zip` controls the robot
 without learning. Only the drone is trained, and its policy is saved separately
 at `models/ppo_drone/runs/<run-id>/final_model.zip`. Drone actions command X/Y velocity up to
-1 m/s per axis, with fixed altitude 3 m and positions limited to [-5, 5] m.
-Drone spawn is randomized in [-4, 4] m on reset. A drone episode ends on bottle
+1 m/s per axis, with fixed altitude 3 m and positions limited to [-3.5, 3.5] m.
+Drone spawn is randomized in [-3, 3] m on reset. A drone episode ends on bottle
 detection or after 800 steps. Use `--agent robot` for the original robot task.
 
 ## TensorBoard and success rate
@@ -170,3 +171,30 @@ Without `--model`, evaluation and resume select the latest completed run, not
 the run with the highest success rate. To select the original checkpoint, use
 `--model models/ppo_drone/final_model.zip`. Best selection still uses the
 last 100 episodes of each individual training; a short run may have no best.
+
+## Drone-to-robot target communication
+
+With `--agent drone`, the robot observation keeps its seven elements, but the
+relative target vector is `[0, 0]` and `go=0` until detection. The drone writes
+`[found, target_x / 5, target_y / 5]` into `shared_comm`; the robot then receives
+the relative vector reconstructed from that broadcast and `go=1`. Communication
+persists until reset. The random go delay applies only to robot-only mode.
+
+Drone training still ends at discovery. Drone evaluation continues after
+discovery until the robot reaches the target or the episode times out, so the
+reported success rate measures completion by the robot. The same render command
+shows search followed by navigation:
+
+```bash
+python robot_experiment.py evaluate --agent drone --render --model models/ppo_drone/runs/run_001
+```
+
+Existing checkpoint shapes remain compatible. The robot now receives hidden
+target coordinates while waiting, unlike its earlier training observations;
+its waiting behavior under this input should be evaluated.
+
+As in the thesis (section 6.2.1), with the drone active, robot motor commands
+are forced to zero until the drone broadcasts detection. The policy controls
+the robot starting with the next action after discovery. This gate is enforced
+by the environment and requires no retraining. Robot-only mode keeps policy
+control during its original waiting exercise.

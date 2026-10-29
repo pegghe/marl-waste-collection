@@ -19,24 +19,35 @@ class RobotAgent:
     def reset(self):
         env = self.env
         self.go_delay = env.np_random.integers(0, 101)
-        self.go = int(self.go_delay == 0)
+        self.go = 0 if env.drone_training else int(self.go_delay == 0)
         qpos = env.init_qpos.copy()
-        qpos[:2] = env.np_random.uniform(-4, 4, size=2)
+        qpos[:2] = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
         self.start_position = qpos[:2].copy()
-        env.target = env.np_random.uniform(-4, 4, size=2)
+        env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
         while np.linalg.norm(env.target - qpos[:2]) < 0.75:
-            env.target = env.np_random.uniform(-4, 4, size=2)
+            env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
         return qpos
 
     def apply_action(self, action):
+        # As in the thesis, ground-agent actions stay zero until detection.
+        if self.env.drone_training and not self.env.shared_comm[0]:
+            action = np.zeros(self.action_space.shape, dtype=self.action_space.dtype)
         self.env.do_simulation(np.clip(action, -1, 1), self.env.frame_skip)
 
     def get_observation(self):
-        # Position, velocity, relative target coordinates, go signal.
+        # The robot only receives the target broadcast after drone detection.
+        if self.env.drone_training:
+            self.go = int(bool(self.env.shared_comm[0]))
+            relative_target = (
+                self.env.shared_comm[1:] * self.env.drone.area_half_size - self.env.data.qpos[:2]
+                if self.go else np.zeros(2)
+            )
+        else:
+            relative_target = self.env.target - self.env.data.qpos[:2]
         return np.concatenate((
             self.env.data.qpos[:2],
             self.env.data.qvel[:2],
-            self.env.target - self.env.data.qpos[:2],
+            relative_target,
             [self.go],
         ))
 
@@ -53,7 +64,8 @@ class RobotAgent:
             reward += 10
 
         # The next action receives go=1 once the waiting period is over.
-        self.go = int(self.env.steps >= self.go_delay)
+        if not self.env.drone_training:
+            self.go = int(self.env.steps >= self.go_delay)
         return float(reward), success, distance
 
 
@@ -79,6 +91,7 @@ class DroneAgent:
         self.target_geom_ids = np.flatnonzero(self.env.model.geom_bodyid == target_body_id)
         self.cell_size = 0.5
         self.discovery_bonus = 20.0
+        # Keep the coordinate scale used by existing checkpoints.
         self.area_half_size = 5.0
         self.observation_space = spaces.Box(
             low=np.array([0, -1, -1, -1, -1] + [0] * 18, dtype=np.float32),
@@ -128,12 +141,15 @@ class DroneAgent:
     def apply_action(self, action):
         position = self.env.data.mocap_pos[self.mocap_id]
         position[:2] = np.clip(
-            position[:2] + np.clip(action, -1, 1) * self.speed * self.env.dt, -5, 5,
+            position[:2] + np.clip(action, -1, 1) * self.speed * self.env.dt,
+            -self.env.area_half_size, self.env.area_half_size,
         )
 
     def reset_position(self, randomize=False):
         if randomize:
-            self.env.data.mocap_pos[self.mocap_id, :2] = self.env.np_random.uniform(-4, 4, size=2)
+            self.env.data.mocap_pos[self.mocap_id, :2] = self.env.np_random.uniform(
+                -self.env.spawn_half_size, self.env.spawn_half_size, size=2,
+            )
 
     def reset(self):
         self.update_rays()

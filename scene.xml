@@ -9,10 +9,10 @@
   </asset>
   <worldbody>
     <light pos="0 0 5" dir="0 0 -1" directional="true"/>
-    <geom name="floor" type="plane" size="6 6 0.1" material="grass"/>
+    <geom name="floor" type="plane" size="4 4 0.1" material="grass"/>
     <body name="robot" pos="0 0 0.16">
-      <joint name="x" type="slide" axis="1 0 0" limited="true" range="-5 5" damping="2"/>
-      <joint name="y" type="slide" axis="0 1 0" limited="true" range="-5 5" damping="2"/>
+      <joint name="x" type="slide" axis="1 0 0" limited="true" range="-3.5 3.5" damping="2"/>
+      <joint name="y" type="slide" axis="0 1 0" limited="true" range="-3.5 3.5" damping="2"/>
       <geom name="robot_body" type="cylinder" size="0.18 0.15" mass="1" rgba="0.02 0.02 0.02 1"/>
       <site name="heading" pos="0.14 0 0.16" size="0.04" rgba="1 1 1 1"/>
     </body>
