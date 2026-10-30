@@ -12,12 +12,16 @@ class RobotAgent:
 
     def __init__(self, env):
         self.env = env
+        self.visual_body_id = env.model.body("robot_visual").id
+        self.max_turn_speed = np.deg2rad(120.0)
+        self.turn_response_time = 0.3
         self.success_radius = 0.25
         self.observation_space = env.observation_space
         self.action_space = env.action_space
 
     def reset(self):
         env = self.env
+        env.model.body_quat[self.visual_body_id] = [1, 0, 0, 0]
         self.go_delay = env.np_random.integers(0, 101)
         self.go = 0 if env.drone_training else int(self.go_delay == 0)
         qpos = env.init_qpos.copy()
@@ -33,6 +37,34 @@ class RobotAgent:
         if self.env.drone_training and not self.env.shared_comm[0]:
             action = np.zeros(self.action_space.shape, dtype=self.action_space.dtype)
         self.env.do_simulation(np.clip(action, -1, 1), self.env.frame_skip)
+        self.face_target()
+
+    def face_target(self):
+        env = self.env
+        if env.drone_training:
+            if not env.shared_comm[0]:
+                return
+            target = env.shared_comm[1:] * env.drone.area_half_size
+        else:
+            if not self.go:
+                return
+            target = env.target
+        direction = target - env.data.qpos[:2]
+        if np.linalg.norm(direction) < 1e-8:
+            return
+        quat = env.model.body_quat[self.visual_body_id]
+        yaw = 2 * np.arctan2(quat[3], quat[0])
+        target_yaw = np.arctan2(direction[1], direction[0])
+        # Follow the shortest arc, easing into alignment without an initial snap.
+        error = (target_yaw - yaw + np.pi) % (2 * np.pi) - np.pi
+        turn = error * (-np.expm1(-env.dt / self.turn_response_time))
+        max_turn = self.max_turn_speed * env.dt
+        half_yaw = 0.5 * (yaw + np.clip(turn, -max_turn, max_turn))
+        # The decorative shell faces +X; keep the XY joints and collision body unchanged.
+        env.model.body_quat[self.visual_body_id] = [
+            np.cos(half_yaw), 0, 0, np.sin(half_yaw),
+        ]
+        mujoco.mj_forward(env.model, env.data)
 
     def get_observation(self):
         # The robot only receives the target broadcast after drone detection.

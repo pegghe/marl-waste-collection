@@ -198,3 +198,8 @@ are forced to zero until the drone broadcasts detection. The policy controls
 the robot starting with the next action after discovery. This gate is enforced
 by the environment and requires no retraining. Robot-only mode keeps policy
 control during its original waiting exercise.
+
+The robot has a yellow-and-black quadruped appearance inspired by Spot, with
+four bent legs, rubber feet, and a front sensor panel. These parts are decorative:
+the existing XY controls, collision cylinder, mass, and inertia are preserved.
+The legs do not articulate; locomotion still uses the existing sliding joints.
