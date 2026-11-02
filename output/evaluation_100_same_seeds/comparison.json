@@ -1,0 +1,125 @@
+{
+  "scenarios_verified_identical": true,
+  "seed_start": 100,
+  "seed_end": 199,
+  "episodes_per_model": 100,
+  "paired_bootstrap_resamples": 20000,
+  "summaries": {
+    "source_best": {
+      "found": 75,
+      "episodes": 100,
+      "mean_reward": -28.21943170550618,
+      "mean_steps": 851.9,
+      "mean_discovery_steps_when_found": 469.2,
+      "mean_speed": 0.5315914117538115,
+      "blocked_step_percent": 10.21950933208123,
+      "stationary_step_percent": 0.11503697617091208,
+      "mean_visited_cells": 29.43,
+      "mean_reward_components": {
+        "time": -42.55749999999886,
+        "exploration": 14.215,
+        "discovery": 11.488499999999998,
+        "boundary": -7.145744637419884,
+        "stagnation": -4.2196870680867145
+      }
+    },
+    "resumed_best": {
+      "found": 74,
+      "episodes": 100,
+      "mean_reward": -26.348829400820645,
+      "mean_steps": 873.6,
+      "mean_discovery_steps_when_found": 477.8378378378378,
+      "mean_speed": 0.5294026282520443,
+      "blocked_step_percent": 6.6632326007326,
+      "stationary_step_percent": 0.2518315018315018,
+      "mean_visited_cells": 32.5,
+      "mean_reward_components": {
+        "time": -43.6429999999988,
+        "exploration": 15.75,
+        "discovery": 11.271400000000002,
+        "boundary": -5.278142464720979,
+        "stagnation": -4.449086936100182
+      }
+    },
+    "resumed_final": {
+      "found": 76,
+      "episodes": 100,
+      "mean_reward": -18.445078901268754,
+      "mean_steps": 807.99,
+      "mean_discovery_steps_when_found": 431.5657894736842,
+      "mean_speed": 0.5496673900515695,
+      "blocked_step_percent": 3.500043317367789,
+      "stationary_step_percent": 0.0,
+      "mean_visited_cells": 32.32,
+      "mean_reward_components": {
+        "time": -40.36149999999891,
+        "exploration": 15.66,
+        "discovery": 11.9277,
+        "boundary": -2.091823542293224,
+        "stagnation": -3.579455358976056
+      }
+    }
+  },
+  "paired_comparisons_against_source": {
+    "resumed_best": {
+      "gained_successes": 13,
+      "lost_successes": 14,
+      "both_found": 61,
+      "both_failed": 12,
+      "exact_mcnemar_p": 1.0,
+      "metrics": {
+        "found": {
+          "mean_difference": -0.01,
+          "paired_bootstrap_95_interval": [
+            -0.11,
+            0.09
+          ]
+        },
+        "reward": {
+          "mean_difference": 1.8706023046855347,
+          "paired_bootstrap_95_interval": [
+            -10.513925180025993,
+            14.067390346874308
+          ]
+        },
+        "steps": {
+          "mean_difference": 21.7,
+          "paired_bootstrap_95_interval": [
+            -138.4325,
+            181.58024999999998
+          ]
+        }
+      }
+    },
+    "resumed_final": {
+      "gained_successes": 10,
+      "lost_successes": 9,
+      "both_found": 66,
+      "both_failed": 15,
+      "exact_mcnemar_p": 1.0,
+      "metrics": {
+        "found": {
+          "mean_difference": 0.01,
+          "paired_bootstrap_95_interval": [
+            -0.08,
+            0.1
+          ]
+        },
+        "reward": {
+          "mean_difference": 9.774352804237424,
+          "paired_bootstrap_95_interval": [
+            -1.0638942480546685,
+            20.597296007779985
+          ]
+        },
+        "steps": {
+          "mean_difference": -43.91,
+          "paired_bootstrap_95_interval": [
+            -195.826,
+            109.18124999999989
+          ]
+        }
+      }
+    }
+  }
+}

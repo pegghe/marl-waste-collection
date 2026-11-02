@@ -119,20 +119,33 @@ class DroneAgent:
         self.mocap_id = int(self.env.model.body_mocapid[self.body_id])
         self.action_space = spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
         self.speed = 1.0
+        self.min_search_speed = 0.3
+        self.boundary_penalty = 0.2
+        self.stagnation_penalty = 0.05
+        self.blocked_fraction = 0.0
+        self.last_movement = 0.0
+        self.debug_actions = False
         target_body_id = self.env.model.body("target").id
         self.target_geom_ids = np.flatnonzero(self.env.model.geom_bodyid == target_body_id)
         self.cell_size = 0.5
+        # Rows follow world Y and columns follow world X, starting at the lower bounds.
+        map_size = int(np.ceil(2 * env.area_half_size / self.cell_size))
+        self.visited_map = np.zeros((map_size, map_size), dtype=np.float32)
         self.discovery_bonus = 20.0
-        # Keep the coordinate scale used by existing checkpoints.
+        # Keep the existing coordinate scale for observations and target communication.
         self.area_half_size = 5.0
         self.observation_space = spaces.Box(
-            low=np.array([0, -1, -1, -1, -1] + [0] * 18, dtype=np.float32),
+            low=np.array([0, -1, -1, -1, -1] + [0] * (18 + self.visited_map.size),
+                         dtype=np.float32),
             high=1.0, dtype=np.float32,
         )
 
     def cell(self):
+        """Return the current (row, column), keeping the outer boundaries in the map."""
         position = self.env.data.xpos[self.body_id, :2]
-        return tuple(np.floor(position / self.cell_size).astype(int))
+        xy = np.floor((position + self.env.area_half_size) / self.cell_size).astype(int)
+        xy = np.clip(xy, 0, self.visited_map.shape[0] - 1)
+        return int(xy[1]), int(xy[0])
 
     def get_observation(self):
         ranges = np.where(self.ray_distances < 0, self.ray_length,
@@ -143,15 +156,20 @@ class DroneAgent:
         position = self.env.data.xpos[self.body_id, :2] / self.area_half_size
         return np.concatenate((
             self.env.shared_comm, np.clip(position, -1, 1), rays.ravel(),
+            self.visited_map.ravel(),
         )).astype(np.float32)
 
     def compute_reward(self):
-        components = {"time": 0.0, "exploration": 0.0, "discovery": 0.0}
+        components = {
+            "time": 0.0, "exploration": 0.0, "discovery": 0.0,
+            "boundary": 0.0, "stagnation": 0.0,
+        }
+        cell = self.cell()
+        new_cell = not self.visited_map[cell]
+        self.visited_map[cell] = 1.0
         if not self.env.shared_comm[0]:
             detected = self.is_bottle.any()
-            cell = self.cell()
-            if cell not in self.visited_cells:
-                self.visited_cells.add(cell)
+            if new_cell:
                 components["exploration"] = 0.5
             if detected:
                 remaining = max(0.0, 1.0 - (self.env.steps - 1) / self.env.max_steps)
@@ -160,6 +178,12 @@ class DroneAgent:
                 self.env.shared_comm[1:] = self.env.target / self.area_half_size
             else:
                 components["time"] = -0.05
+                components["boundary"] = -self.boundary_penalty * self.blocked_fraction
+                slow_fraction = np.clip(
+                    1 - self.last_movement / (self.min_search_speed * self.env.dt),
+                    0, 1,
+                )
+                components["stagnation"] = -self.stagnation_penalty * slow_fraction
         self.reward_components = components
         self.reward = sum(components.values())
 
@@ -171,11 +195,21 @@ class DroneAgent:
         self.is_bottle = np.isin(self.ray_geomids, self.target_geom_ids)
 
     def apply_action(self, action):
-        position = self.env.data.mocap_pos[self.mocap_id]
-        position[:2] = np.clip(
-            position[:2] + np.clip(action, -1, 1) * self.speed * self.env.dt,
+        position = self.env.data.mocap_pos[self.mocap_id] #actual position of the drone
+        step_length = self.speed * self.env.dt #max step_length (1*0.05)= 0.05 meters
+        requested = position[:2] + np.clip(action, -1, 1) * step_length #add the spostamento to the actual position
+        #the drone must stay inside the boards limits (-3.5, +3.5)
+        destination = np.clip(
+            requested,
             -self.env.area_half_size, self.env.area_half_size,
         )
+        # Measure actual progress, including the part of the command rejected at an edge.
+        self.blocked_fraction = float(np.clip(
+            np.linalg.norm(requested - destination) / step_length, 0, 1,
+        ))
+        self.last_movement = float(np.linalg.norm(destination - position[:2]))
+        position[:2] = destination
+        
 
     def reset_position(self, randomize=False):
         if randomize:
@@ -185,9 +219,15 @@ class DroneAgent:
 
     def reset(self):
         self.update_rays()
-        self.visited_cells = {self.cell()}
+        self.visited_map.fill(0.0)
+        self.visited_map[self.cell()] = 1.0
+        self.blocked_fraction = 0.0
+        self.last_movement = 0.0
         self.reward = 0.0
-        self.reward_components = {"time": 0.0, "exploration": 0.0, "discovery": 0.0}
+        self.reward_components = {
+            "time": 0.0, "exploration": 0.0, "discovery": 0.0,
+            "boundary": 0.0, "stagnation": 0.0,
+        }
 
     def render_rays(self, viewer):
         self.update_rays()

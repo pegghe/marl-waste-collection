@@ -1,0 +1,101 @@
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 10/100, successes=7
+models/ppo_drone/runs/border_penalty/best_model.zip: 10/100, successes=6
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 10/100, successes=4
+models/ppo_drone/runs/border_penalty/final_model.zip: 10/100, successes=4
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 20/100, successes=14
+models/ppo_drone/runs/border_penalty/best_model.zip: 20/100, successes=12
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 20/100, successes=11
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 30/100, successes=21
+models/ppo_drone/runs/border_penalty/final_model.zip: 20/100, successes=11
+models/ppo_drone/runs/border_penalty/best_model.zip: 30/100, successes=21
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 30/100, successes=18
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 40/100, successes=28
+models/ppo_drone/runs/border_penalty/final_model.zip: 30/100, successes=17
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 40/100, successes=26
+models/ppo_drone/runs/border_penalty/best_model.zip: 40/100, successes=27
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 50/100, successes=36
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 60/100, successes=45
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 50/100, successes=33
+models/ppo_drone/runs/border_penalty/final_model.zip: 40/100, successes=23
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 70/100, successes=53
+models/ppo_drone/runs/border_penalty/best_model.zip: 50/100, successes=33
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 60/100, successes=40
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 80/100, successes=61
+models/ppo_drone/runs/border_penalty/best_model.zip: 60/100, successes=40
+models/ppo_drone/runs/border_penalty/final_model.zip: 50/100, successes=26
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 70/100, successes=47
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 90/100, successes=69
+models/ppo_drone/runs/border_penalty/best_model.zip: 70/100, successes=49
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip: 100/100, successes=78
+models/ppo_drone/runs/border_penalty/final_model.zip: 60/100, successes=31
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 80/100, successes=52
+models/ppo_drone/runs/border_penalty/best_model.zip: 80/100, successes=55
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 10/100, successes=8
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 90/100, successes=60
+models/ppo_drone/runs/border_penalty/best_model.zip: 90/100, successes=62
+models/ppo_drone/runs/border_penalty/final_model.zip: 70/100, successes=35
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 20/100, successes=14
+models/ppo_drone/runs/border_penalty_+200/best_model.zip: 100/100, successes=65
+models/ppo_drone/runs/border_penalty/best_model.zip: 100/100, successes=69
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 30/100, successes=21
+models/ppo_drone/runs/border_penalty/final_model.zip: 80/100, successes=40
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 10/100, successes=7
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 40/100, successes=27
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 20/100, successes=14
+models/ppo_drone/runs/border_penalty/final_model.zip: 90/100, successes=43
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 50/100, successes=33
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 30/100, successes=21
+models/ppo_drone/runs/border_penalty/final_model.zip: 100/100, successes=48
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 60/100, successes=41
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 40/100, successes=28
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 70/100, successes=49
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 50/100, successes=36
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 80/100, successes=54
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 60/100, successes=43
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 90/100, successes=61
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 70/100, successes=52
+models/ppo_drone/runs/border_penalty_+200/final_model.zip: 100/100, successes=69
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 80/100, successes=57
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 90/100, successes=65
+models/ppo_drone/runs/border_penalty_1.4mln/final_model.zip: 100/100, successes=74
+concurrent.futures.process._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/concurrent/futures/process.py", line 264, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/marl-waste-collection/compare_runs.py", line 35, in evaluate_checkpoint
+    key: model.predict(obs[key], deterministic=False)[0]
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/site-packages/stable_baselines3/common/base_class.py", line 557, in predict
+    return self.policy.predict(observation, state, episode_start, deterministic)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/site-packages/stable_baselines3/common/policies.py", line 365, in predict
+    obs_tensor, vectorized_env = self.obs_to_tensor(observation)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/site-packages/stable_baselines3/common/policies.py", line 272, in obs_to_tensor
+    vectorized_env = is_vectorized_observation(observation, self.observation_space)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/site-packages/stable_baselines3/common/utils.py", line 487, in is_vectorized_observation
+    return is_vec_obs_func(observation, observation_space)  # type: ignore[operator]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/site-packages/stable_baselines3/common/utils.py", line 354, in is_vectorized_box_observation
+    raise ValueError(
+ValueError: Error: Unexpected observation shape (219,) for Box environment, please use (23,) or (n_env, 23) for the observation shape.
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/rl/marl-waste-collection/compare_runs.py", line 88, in <module>
+    with (args.output / 'summary.csv').open('w') as handle:
+^^
+  File "/home/rl/marl-waste-collection/compare_runs.py", line 74, in main
+    checkpoints += sorted(Path('models/ppo_drone/runs').glob('*/final_model.zip'))
+                           ^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/rl/miniconda3/envs/rl/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+ValueError: Error: Unexpected observation shape (219,) for Box environment, please use (23,) or (n_env, 23) for the observation shape.

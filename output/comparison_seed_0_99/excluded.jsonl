@@ -1,0 +1,2 @@
+{"checkpoint": "models/ppo_drone/runs/run_001/final_model.zip", "error": "Observation shape (23,); environment (219,)"}
+{"checkpoint": "models/ppo_drone/runs/run_001/best_model.zip", "error": "Observation shape (23,); environment (219,)"}

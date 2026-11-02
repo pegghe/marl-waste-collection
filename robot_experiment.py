@@ -141,16 +141,22 @@ class RobotExperiment:
             except FileExistsError:
                 run_number += 1
         self.last_run_directory = output
+        robot_env = RobotMAEnv(drone_training=agent == "drone")
+        drone = robot_env.env.drone
         (output / "config.json").write_text(json.dumps({
             "agent": agent, "requested_steps": steps,
             "resume_from": str(checkpoint.resolve()) if checkpoint else None,
             "robot_model": str(Path(self.model_path).resolve()) if agent == "drone" else None,
+            "drone_search": {
+                "speed": drone.speed, "min_search_speed": drone.min_search_speed,
+                "boundary_penalty": drone.boundary_penalty,
+                "stagnation_penalty": drone.stagnation_penalty,
+            } if agent == "drone" else None,
         }, indent=2) + "\n")
         print(f"Training output: {output}")
         if checkpoint:
             print(f"Resuming from: {checkpoint}")
         torch.set_num_threads(1)
-        robot_env = RobotMAEnv(drone_training=agent == "drone")
         robot_env.reset(seed=0)
         env = SuccessVecEnv(robot_env, learning_agent_ids=[agent])
         env = VecMonitor(env)
@@ -165,6 +171,7 @@ class RobotExperiment:
         params = {
             "policy": "MlpPolicy", "seed": 0, "device": "cpu", "verbose": 1,
             "tensorboard_log": "./tensorboard_logs/",
+             "learning_rate": 0.0001,
         }
         model_algo_map = {agent: (RolloutPPO, {**params, "best_output": str(output)})}
         models_to_load = None
@@ -192,7 +199,8 @@ class RobotExperiment:
         finally:
             env.close()
 
-    def evaluate(self, episodes=10, render=False, agent="robot", best=False, model=None):
+    def evaluate(self, episodes=10, render=False, agent="robot", best=False, model=None,
+                 debug_actions=False):
         checkpoint = self.resolve_model(agent, model, best)
         print(f"Evaluating: {checkpoint}")
         robot_path = checkpoint if agent == "robot" else self.model_path
@@ -204,6 +212,7 @@ class RobotExperiment:
             render_mode="human" if render else None, drone_training=agent == "drone",
             finish_on_discovery=False,
         )
+        env.env.drone.debug_actions = debug_actions
         try:
             avg_agent, avg_model = ma_evaluate(
                 env, models, total_episodes=episodes, verbose=True,
@@ -229,8 +238,12 @@ if __name__ == "__main__":
     parser.add_argument("--best", action="store_true",
                         help="Evaluate the selected agent's best_model instead of final_model")
     parser.add_argument("--render", action="store_true")
+    parser.add_argument("--debug-actions", action="store_true",
+                        help="Print drone actions, requested/actual positions, speed and boundary blocking during evaluation")
     parser.add_argument("--episodes", type=int, default=10)
     args = parser.parse_args()
+    if args.debug_actions and (args.mode != "evaluate" or args.agent != "drone"):
+        parser.error("--debug-actions requires evaluate --agent drone")
 
     if args.mode == "train" and args.model is not None and not args.resume:
         parser.error("--model requires --resume when training")
@@ -240,5 +253,6 @@ if __name__ == "__main__":
     if args.mode == "train":
         experiment.train(agent=args.agent, steps=args.steps, resume=args.resume, model=args.model)
     else:
-        experiment.evaluate(episodes=args.episodes, render=args.render, agent=args.agent, best=args.best, model=args.model)
+        experiment.evaluate(episodes=args.episodes, render=args.render, agent=args.agent,
+                            best=args.best, model=args.model, debug_actions=args.debug_actions)
 

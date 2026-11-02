@@ -1,0 +1,7 @@
+{
+  "checkpoint": "models/ppo_drone/runs/run_005/final_model.zip",
+  "source": "models/ppo_drone/runs/run_004/best_model.zip",
+  "additional_steps": 65536,
+  "total_steps": 403456,
+  "training_log": "/tmp/drone-boundary-pghp6_j7.log"
+}

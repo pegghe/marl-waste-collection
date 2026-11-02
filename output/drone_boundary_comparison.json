@@ -1,0 +1,314 @@
+{
+  "description": "Drone search only, stochastic actions as in ma_evaluate, seeds 0..9; torch seed 1000+episode seed. Same speed 1 m/s per axis for all policies.",
+  "models": {
+    "models/ppo_drone/runs/run_004/final_model.zip": {
+      "summary": {
+        "found": 2,
+        "episodes": 10,
+        "mean_speed_m_s": 0.27469239425713027,
+        "blocked_fraction": 0.5684380032206119,
+        "stationary_fraction": 0.06339834198127274,
+        "mean_visited_cells": 28.2,
+        "total_trained_steps": 600064
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.25004606369926646,
+          "blocked_steps": 1121,
+          "stationary_steps": 276,
+          "visited_cells": 36
+        },
+        {
+          "seed": 1,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.27157372932716206,
+          "blocked_steps": 1173,
+          "stationary_steps": 79,
+          "visited_cells": 38
+        },
+        {
+          "seed": 2,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.22578853146247232,
+          "blocked_steps": 1607,
+          "stationary_steps": 1,
+          "visited_cells": 25
+        },
+        {
+          "seed": 3,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.2401697870283812,
+          "blocked_steps": 1071,
+          "stationary_steps": 248,
+          "visited_cells": 28
+        },
+        {
+          "seed": 4,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.2514863925072946,
+          "blocked_steps": 1092,
+          "stationary_steps": 295,
+          "visited_cells": 31
+        },
+        {
+          "seed": 5,
+          "steps": 209,
+          "found": true,
+          "speed_m_s": 0.2915591962483702,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 5
+        },
+        {
+          "seed": 6,
+          "steps": 558,
+          "found": true,
+          "speed_m_s": 0.38570781803769305,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 24
+        },
+        {
+          "seed": 7,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.22059009406855154,
+          "blocked_steps": 1696,
+          "stationary_steps": 1,
+          "visited_cells": 24
+        },
+        {
+          "seed": 8,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.3100637673104409,
+          "blocked_steps": 532,
+          "stationary_steps": 162,
+          "visited_cells": 37
+        },
+        {
+          "seed": 9,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.29993856288167003,
+          "blocked_steps": 1239,
+          "stationary_steps": 1,
+          "visited_cells": 34
+        }
+      ]
+    },
+    "models/ppo_drone/runs/run_004/best_model.zip": {
+      "summary": {
+        "found": 5,
+        "episodes": 10,
+        "mean_speed_m_s": 0.5070480352672366,
+        "blocked_fraction": 0.31703703703703706,
+        "stationary_fraction": 0.05458089668615984,
+        "mean_visited_cells": 29.6,
+        "total_trained_steps": 337920
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.3526314234470062,
+          "blocked_steps": 1092,
+          "stationary_steps": 187,
+          "visited_cells": 40
+        },
+        {
+          "seed": 1,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.36528345572874293,
+          "blocked_steps": 1288,
+          "stationary_steps": 183,
+          "visited_cells": 37
+        },
+        {
+          "seed": 2,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.4586885406939654,
+          "blocked_steps": 220,
+          "stationary_steps": 0,
+          "visited_cells": 46
+        },
+        {
+          "seed": 3,
+          "steps": 52,
+          "found": true,
+          "speed_m_s": 0.7209781805961987,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 4
+        },
+        {
+          "seed": 4,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.32485030827254485,
+          "blocked_steps": 1388,
+          "stationary_steps": 330,
+          "visited_cells": 35
+        },
+        {
+          "seed": 5,
+          "steps": 688,
+          "found": true,
+          "speed_m_s": 0.46059223100279695,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 11
+        },
+        {
+          "seed": 6,
+          "steps": 430,
+          "found": true,
+          "speed_m_s": 0.6562660340886504,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 32
+        },
+        {
+          "seed": 7,
+          "steps": 152,
+          "found": true,
+          "speed_m_s": 0.748032693617936,
+          "blocked_steps": 1,
+          "stationary_steps": 0,
+          "visited_cells": 13
+        },
+        {
+          "seed": 8,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.46984900859823947,
+          "blocked_steps": 77,
+          "stationary_steps": 0,
+          "visited_cells": 31
+        },
+        {
+          "seed": 9,
+          "steps": 1503,
+          "found": true,
+          "speed_m_s": 0.5133084766262852,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 47
+        }
+      ]
+    },
+    "models/ppo_drone/runs/run_005/final_model.zip": {
+      "summary": {
+        "found": 4,
+        "episodes": 10,
+        "mean_speed_m_s": 0.4474165570794909,
+        "blocked_fraction": 0.12331884957583282,
+        "stationary_fraction": 0.0022070487619835853,
+        "mean_visited_cells": 24.6,
+        "total_trained_steps": 403456
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.4127299231902666,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 27
+        },
+        {
+          "seed": 1,
+          "steps": 1130,
+          "found": true,
+          "speed_m_s": 0.47021795637422253,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 32
+        },
+        {
+          "seed": 2,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.4147957354252681,
+          "blocked_steps": 98,
+          "stationary_steps": 0,
+          "visited_cells": 29
+        },
+        {
+          "seed": 3,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.40940593669209974,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 33
+        },
+        {
+          "seed": 4,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.43142496591085944,
+          "blocked_steps": 182,
+          "stationary_steps": 0,
+          "visited_cells": 43
+        },
+        {
+          "seed": 5,
+          "steps": 81,
+          "found": true,
+          "speed_m_s": 0.5044034789853634,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 5
+        },
+        {
+          "seed": 6,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.4115662684576873,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 25
+        },
+        {
+          "seed": 7,
+          "steps": 2000,
+          "found": false,
+          "speed_m_s": 0.3508332639141682,
+          "blocked_steps": 1508,
+          "stationary_steps": 32,
+          "visited_cells": 26
+        },
+        {
+          "seed": 8,
+          "steps": 1280,
+          "found": true,
+          "speed_m_s": 0.4176371252374082,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 23
+        },
+        {
+          "seed": 9,
+          "steps": 8,
+          "found": true,
+          "speed_m_s": 0.6511509166075663,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "visited_cells": 3
+        }
+      ]
+    }
+  }
+}

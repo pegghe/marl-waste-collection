@@ -1,0 +1,3128 @@
+{
+  "label": "latest_best",
+  "checkpoint": "models/ppo_drone/runs/run_005/best_model.zip",
+  "sha256": "9528fdea74f443c2b0d66014296133a341d05958439857564850109c9364e74d",
+  "method": "MASB3 ma_evaluate, search ends on detection or 2000 steps, env seeds 100..199, Torch seed 1000 + env seed per episode; drone stochastic, robot deterministic",
+  "seed_start": 100,
+  "requested_episodes": 100,
+  "summary": {
+    "found": 81,
+    "episodes": 100,
+    "mean_reward": -21.731415699995633,
+    "mean_steps": 706.93,
+    "mean_discovery_steps_when_found": 403.61728395061726,
+    "mean_speed": 0.5269614999002669,
+    "blocked_step_percent": 13.395951508635934,
+    "stationary_step_percent": 1.9322988131781083,
+    "mean_visited_cells": 32.39,
+    "mean_reward_components": {
+      "time": -35.305999999999116,
+      "exploration": 15.695,
+      "discovery": 12.938799999999999,
+      "boundary": -9.720509299163822,
+      "stagnation": -5.338706400831975
+    }
+  },
+  "episodes": [
+    {
+      "seed": 100,
+      "steps": 227,
+      "found": true,
+      "reward": 19.920758578004307,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0033795262610903,
+      "visited_cells": 28,
+      "reward_components": {
+        "time": -11.300000000000026,
+        "exploration": 13.5,
+        "discovery": 17.740000000000002,
+        "boundary": 0.0,
+        "stagnation": -0.01924142199570188
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5788302243881303,
+          1.7415789865123275
+        ],
+        "robot_xy": [
+          0.5793241618073237,
+          -1.2668205498527785
+        ],
+        "target_xy": [
+          -2.7422905758347316,
+          2.8419263706372853
+        ]
+      }
+    },
+    {
+      "seed": 101,
+      "steps": 90,
+      "found": true,
+      "reward": 19.66,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0052109936280995,
+      "visited_cells": 11,
+      "reward_components": {
+        "time": -4.449999999999992,
+        "exploration": 5.0,
+        "discovery": 19.11,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.536354118537486,
+          2.215989268071416
+        ],
+        "robot_xy": [
+          -0.8434737999505613,
+          1.7088324718198624
+        ],
+        "target_xy": [
+          0.5476691113764707,
+          -1.234028632818431
+        ]
+      }
+    },
+    {
+      "seed": 102,
+      "steps": 36,
+      "found": true,
+      "reward": 19.400000000000002,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0679170188985976,
+      "visited_cells": 4,
+      "reward_components": {
+        "time": -1.7500000000000009,
+        "exploration": 1.5,
+        "discovery": 19.650000000000002,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.21669503816410174,
+          2.348144579234323
+        ],
+        "robot_xy": [
+          0.5156610890413642,
+          1.9430206630970783
+        ],
+        "target_xy": [
+          -1.2164385794382226,
+          1.1093971292778129
+        ]
+      }
+    },
+    {
+      "seed": 103,
+      "steps": 393,
+      "found": true,
+      "reward": 14.425075730288237,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.7474845132267353,
+      "visited_cells": 39,
+      "reward_components": {
+        "time": -19.600000000000144,
+        "exploration": 19.0,
+        "discovery": 16.080000000000002,
+        "boundary": 0.0,
+        "stagnation": -1.054924269711804
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.378625398517158,
+          -1.2654609771945622
+        ],
+        "robot_xy": [
+          -1.6540906642437143,
+          -1.907941631434169
+        ],
+        "target_xy": [
+          2.1610718735605934,
+          2.145254930282217
+        ]
+      }
+    },
+    {
+      "seed": 104,
+      "steps": 150,
+      "found": true,
+      "reward": 21.56,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.071469084397379,
+      "visited_cells": 22,
+      "reward_components": {
+        "time": -7.4499999999999815,
+        "exploration": 10.5,
+        "discovery": 18.509999999999998,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.523331108753533,
+          1.411127769350668
+        ],
+        "robot_xy": [
+          1.152888891764082,
+          -1.7034670306390522
+        ],
+        "target_xy": [
+          -2.2475286123543485,
+          -0.7495842650671967
+        ]
+      }
+    },
+    {
+      "seed": 105,
+      "steps": 46,
+      "found": true,
+      "reward": 20.3,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.1166546313573045,
+      "visited_cells": 7,
+      "reward_components": {
+        "time": -2.25,
+        "exploration": 3.0,
+        "discovery": 19.55,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.76390258372013,
+          2.3002129402246947
+        ],
+        "robot_xy": [
+          2.948758652887549,
+          -2.419623267320258
+        ],
+        "target_xy": [
+          0.0402260506185268,
+          -0.6213662911022677
+        ]
+      }
+    },
+    {
+      "seed": 106,
+      "steps": 1457,
+      "found": true,
+      "reward": -49.052208542164756,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.5140888865075912,
+      "visited_cells": 54,
+      "reward_components": {
+        "time": -72.79999999999801,
+        "exploration": 26.5,
+        "discovery": 5.44,
+        "boundary": 0.0,
+        "stagnation": -8.192208542165925
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.1672041175348813,
+          -1.0463689121930193
+        ],
+        "robot_xy": [
+          -2.757599082638057,
+          -2.263279861014385
+        ],
+        "target_xy": [
+          -0.2144072212352084,
+          2.7866537676184944
+        ]
+      }
+    },
+    {
+      "seed": 107,
+      "steps": 163,
+      "found": true,
+      "reward": 19.273877855855176,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9301345423012712,
+      "visited_cells": 19,
+      "reward_components": {
+        "time": -8.09999999999998,
+        "exploration": 9.0,
+        "discovery": 18.380000000000003,
+        "boundary": 0.0,
+        "stagnation": -0.006122144144821489
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.540802232793621,
+          -0.5063795386309353
+        ],
+        "robot_xy": [
+          -0.1338685840688152,
+          0.016424291515479084
+        ],
+        "target_xy": [
+          1.4087033122129737,
+          -0.05296032380898419
+        ]
+      }
+    },
+    {
+      "seed": 108,
+      "steps": 20,
+      "found": true,
+      "reward": 20.360000000000003,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.2197642663161703,
+      "visited_cells": 4,
+      "reward_components": {
+        "time": -0.9500000000000003,
+        "exploration": 1.5,
+        "discovery": 19.810000000000002,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.5449869309194906,
+          -0.14116189434533233
+        ],
+        "robot_xy": [
+          0.793650931617397,
+          -2.2925666582421553
+        ],
+        "target_xy": [
+          -0.8962038829391488,
+          -1.559346657434149
+        ]
+      }
+    },
+    {
+      "seed": 109,
+      "steps": 102,
+      "found": true,
+      "reward": 19.408893480285844,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.8923815880252658,
+      "visited_cells": 12,
+      "reward_components": {
+        "time": -5.04999999999999,
+        "exploration": 5.5,
+        "discovery": 18.990000000000002,
+        "boundary": 0.0,
+        "stagnation": -0.031106519714157205
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.832992576511219,
+          -2.091342676554042
+        ],
+        "robot_xy": [
+          2.0484530734784876,
+          1.5004564538666223
+        ],
+        "target_xy": [
+          -1.0101874323517646,
+          0.5955187166215987
+        ]
+      }
+    },
+    {
+      "seed": 110,
+      "steps": 479,
+      "found": true,
+      "reward": -64.06632312944555,
+      "blocked_steps": 395,
+      "stationary_steps": 0,
+      "mean_speed": 0.3006386088864152,
+      "visited_cells": 9,
+      "reward_components": {
+        "time": -23.900000000000205,
+        "exploration": 4.0,
+        "discovery": 15.22,
+        "boundary": -51.22222821365739,
+        "stagnation": -8.16409491578862
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.2581280813152045,
+          -2.587195767250198
+        ],
+        "robot_xy": [
+          0.07462668740437639,
+          1.2751399831343937
+        ],
+        "target_xy": [
+          0.01334298080826457,
+          -1.5608993530590678
+        ]
+      }
+    },
+    {
+      "seed": 111,
+      "steps": 1705,
+      "found": true,
+      "reward": -61.47472697753768,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.5138337547447704,
+      "visited_cells": 64,
+      "reward_components": {
+        "time": -85.1999999999973,
+        "exploration": 31.5,
+        "discovery": 2.9600000000000004,
+        "boundary": 0.0,
+        "stagnation": -10.734726977539166
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.3446352467148674,
+          1.7855791581914051
+        ],
+        "robot_xy": [
+          -1.9841801942461943,
+          0.03578588698959351
+        ],
+        "target_xy": [
+          0.9487132407225078,
+          1.6054852621458338
+        ]
+      }
+    },
+    {
+      "seed": 112,
+      "steps": 1250,
+      "found": true,
+      "reward": -35.506210710480815,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.5202781458782868,
+      "visited_cells": 51,
+      "reward_components": {
+        "time": -62.44999999999859,
+        "exploration": 25.0,
+        "discovery": 7.509999999999999,
+        "boundary": 0.0,
+        "stagnation": -5.56621071048112
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.021261925208072352,
+          1.9625928795641325
+        ],
+        "robot_xy": [
+          2.0649214379144256,
+          1.7920405459479394
+        ],
+        "target_xy": [
+          -2.895620308217025,
+          -2.5383196890017787
+        ]
+      }
+    },
+    {
+      "seed": 113,
+      "steps": 57,
+      "found": true,
+      "reward": 19.633310414908042,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.8645431226918092,
+      "visited_cells": 7,
+      "reward_components": {
+        "time": -2.799999999999998,
+        "exploration": 3.0,
+        "discovery": 19.439999999999998,
+        "boundary": 0.0,
+        "stagnation": -0.006689585091954081
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.9931342588110326,
+          -0.01962300489057789
+        ],
+        "robot_xy": [
+          -2.0947863006614718,
+          -2.1314234527186056
+        ],
+        "target_xy": [
+          0.6629602155702834,
+          -0.24279942205377747
+        ]
+      }
+    },
+    {
+      "seed": 114,
+      "steps": 2000,
+      "found": false,
+      "reward": -100.8651430099571,
+      "blocked_steps": 138,
+      "stationary_steps": 0,
+      "mean_speed": 0.43278133654174694,
+      "visited_cells": 51,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 25.0,
+        "discovery": 0.0,
+        "boundary": -9.21704869140394,
+        "stagnation": -16.64809431855456
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.8717777268599018,
+          -0.3904513642647993
+        ],
+        "robot_xy": [
+          -2.147045297230636,
+          -0.3996946456797046
+        ],
+        "target_xy": [
+          1.2246730892201727,
+          0.6498278945832547
+        ]
+      }
+    },
+    {
+      "seed": 115,
+      "steps": 2000,
+      "found": false,
+      "reward": -74.64972015093802,
+      "blocked_steps": 17,
+      "stationary_steps": 0,
+      "mean_speed": 0.5160100677446342,
+      "visited_cells": 73,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 36.0,
+        "discovery": 0.0,
+        "boundary": -0.5754164998320306,
+        "stagnation": -10.074303651107055
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.293113956224028,
+          0.7538329488005466
+        ],
+        "robot_xy": [
+          0.6222544287920941,
+          0.2650143656869721
+        ],
+        "target_xy": [
+          1.9268833470779434,
+          -2.9953693071493346
+        ]
+      }
+    },
+    {
+      "seed": 116,
+      "steps": 2000,
+      "found": false,
+      "reward": -217.90681827387647,
+      "blocked_steps": 1036,
+      "stationary_steps": 556,
+      "mean_speed": 0.3965842534604777,
+      "visited_cells": 81,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 40.0,
+        "discovery": 0.0,
+        "boundary": -114.75067157949609,
+        "stagnation": -43.156146694379366
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5899789032233738,
+          -1.1990209440744253
+        ],
+        "robot_xy": [
+          2.261532687819906,
+          2.7430689565945467
+        ],
+        "target_xy": [
+          2.7051433350092955,
+          0.046109166796179935
+        ]
+      }
+    },
+    {
+      "seed": 117,
+      "steps": 9,
+      "found": true,
+      "reward": 20.520000000000003,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.1117343357008038,
+      "visited_cells": 3,
+      "reward_components": {
+        "time": -0.39999999999999997,
+        "exploration": 1.0,
+        "discovery": 19.92,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.1853236726713485,
+          1.1870717480321735
+        ],
+        "robot_xy": [
+          -2.0527140857596002,
+          0.6243668415232051
+        ],
+        "target_xy": [
+          -0.837202373211408,
+          0.08012038092217377
+        ]
+      }
+    },
+    {
+      "seed": 118,
+      "steps": 8,
+      "found": true,
+      "reward": 20.58,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.2494898510436974,
+      "visited_cells": 3,
+      "reward_components": {
+        "time": -0.35,
+        "exploration": 1.0,
+        "discovery": 19.93,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.7799368774672066,
+          1.035873774247884
+        ],
+        "robot_xy": [
+          2.6253715008115934,
+          -1.3346746259751463
+        ],
+        "target_xy": [
+          -1.7071662836199073,
+          0.18230518939186524
+        ]
+      }
+    },
+    {
+      "seed": 119,
+      "steps": 591,
+      "found": true,
+      "reward": -41.611002723586004,
+      "blocked_steps": 269,
+      "stationary_steps": 0,
+      "mean_speed": 0.6273858650999053,
+      "visited_cells": 41,
+      "reward_components": {
+        "time": -29.500000000000284,
+        "exploration": 20.0,
+        "discovery": 14.100000000000001,
+        "boundary": -41.441696707408795,
+        "stagnation": -4.769306016178005
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.856747120745614,
+          0.3803783205126301
+        ],
+        "robot_xy": [
+          1.3926732748665192,
+          1.914105064695164
+        ],
+        "target_xy": [
+          -2.1386741275510195,
+          1.5398218985128604
+        ]
+      }
+    },
+    {
+      "seed": 120,
+      "steps": 6,
+      "found": true,
+      "reward": 20.200000000000003,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0116728933422878,
+      "visited_cells": 2,
+      "reward_components": {
+        "time": -0.25,
+        "exploration": 0.5,
+        "discovery": 19.950000000000003,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.3756358921818155,
+          0.2595014706947327
+        ],
+        "robot_xy": [
+          -2.657580225383164,
+          -1.4935150967152486
+        ],
+        "target_xy": [
+          0.9241591228296491,
+          0.4663649090609181
+        ]
+      }
+    },
+    {
+      "seed": 121,
+      "steps": 472,
+      "found": true,
+      "reward": 7.021615465366608,
+      "blocked_steps": 93,
+      "stationary_steps": 0,
+      "mean_speed": 0.7573469053726047,
+      "visited_cells": 44,
+      "reward_components": {
+        "time": -23.5500000000002,
+        "exploration": 21.5,
+        "discovery": 15.29,
+        "boundary": -5.409268808512024,
+        "stagnation": -0.8091157261213725
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.7583791639861062,
+          -0.332919553092097
+        ],
+        "robot_xy": [
+          -1.2125851571846136,
+          1.9455615669268402
+        ],
+        "target_xy": [
+          0.48433137264192627,
+          0.5613706886238705
+        ]
+      }
+    },
+    {
+      "seed": 122,
+      "steps": 1341,
+      "found": true,
+      "reward": -61.164851237450286,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.36601211321909916,
+      "visited_cells": 24,
+      "reward_components": {
+        "time": -66.99999999999834,
+        "exploration": 11.5,
+        "discovery": 6.6,
+        "boundary": 0.0,
+        "stagnation": -12.264851237450861
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.032662682899748496,
+          1.6350957296195476
+        ],
+        "robot_xy": [
+          -1.9462559933204877,
+          -0.7344932813886036
+        ],
+        "target_xy": [
+          -1.744126087026514,
+          1.9352530457237886
+        ]
+      }
+    },
+    {
+      "seed": 123,
+      "steps": 151,
+      "found": true,
+      "reward": 22.500000000000018,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.03262267100282,
+      "visited_cells": 24,
+      "reward_components": {
+        "time": -7.499999999999981,
+        "exploration": 11.5,
+        "discovery": 18.5,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.8725670399346424,
+          2.5400699881623385
+        ],
+        "robot_xy": [
+          -2.6770738871866637,
+          -1.6778407633643317
+        ],
+        "target_xy": [
+          -1.8937691358079818,
+          -1.944564593489818
+        ]
+      }
+    },
+    {
+      "seed": 124,
+      "steps": 288,
+      "found": true,
+      "reward": 17.15393933268092,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.8576355107475445,
+      "visited_cells": 30,
+      "reward_components": {
+        "time": -14.350000000000069,
+        "exploration": 14.5,
+        "discovery": 17.130000000000003,
+        "boundary": 0.0,
+        "stagnation": -0.12606066731907867
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.6333072650031477,
+          -1.9283133059123194
+        ],
+        "robot_xy": [
+          1.7151561451572688,
+          2.8148161051371146
+        ],
+        "target_xy": [
+          1.4883586374573916,
+          0.9333048557466572
+        ]
+      }
+    },
+    {
+      "seed": 125,
+      "steps": 165,
+      "found": true,
+      "reward": 20.621865713438112,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.997744085882054,
+      "visited_cells": 22,
+      "reward_components": {
+        "time": -8.199999999999982,
+        "exploration": 10.5,
+        "discovery": 18.36,
+        "boundary": 0.0,
+        "stagnation": -0.038134286561887526
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.681439968141011,
+          1.7180872738042856
+        ],
+        "robot_xy": [
+          -0.038100150267694755,
+          -0.6590293436317558
+        ],
+        "target_xy": [
+          -1.9223545374741495,
+          -2.3955222281932174
+        ]
+      }
+    },
+    {
+      "seed": 126,
+      "steps": 162,
+      "found": true,
+      "reward": 20.840000000000007,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9957551995458802,
+      "visited_cells": 22,
+      "reward_components": {
+        "time": -8.04999999999998,
+        "exploration": 10.5,
+        "discovery": 18.39,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.6419961440828237,
+          0.18327549499337614
+        ],
+        "robot_xy": [
+          2.6505486444939006,
+          -2.603233001169677
+        ],
+        "target_xy": [
+          -2.383746247109167,
+          1.9024506276928985
+        ]
+      }
+    },
+    {
+      "seed": 127,
+      "steps": 2000,
+      "found": false,
+      "reward": -86.80031341554982,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.43322817833512606,
+      "visited_cells": 56,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 27.5,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -14.30031341555085
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5131465863318265,
+          2.758743905692695
+        ],
+        "robot_xy": [
+          -1.7422032594609032,
+          -1.2040051197324106
+        ],
+        "target_xy": [
+          2.4603420215574587,
+          -1.1006945836858915
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "steps": 1287,
+      "found": true,
+      "reward": -46.738195042015306,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.4393373550208677,
+      "visited_cells": 36,
+      "reward_components": {
+        "time": -64.29999999999849,
+        "exploration": 17.5,
+        "discovery": 7.14,
+        "boundary": 0.0,
+        "stagnation": -7.078195042016133
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5189838217471734,
+          2.523493940309386
+        ],
+        "robot_xy": [
+          -0.1673024915108785,
+          -0.3985984061461476
+        ],
+        "target_xy": [
+          -0.576396390594458,
+          -2.5217860217823427
+        ]
+      }
+    },
+    {
+      "seed": 129,
+      "steps": 3,
+      "found": true,
+      "reward": 19.88,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.145015761056053,
+      "visited_cells": 1,
+      "reward_components": {
+        "time": -0.1,
+        "exploration": 0.0,
+        "discovery": 19.98,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.7554473381666575,
+          2.458828883065493
+        ],
+        "robot_xy": [
+          -1.5965767295278515,
+          2.3887669551867354
+        ],
+        "target_xy": [
+          2.3553501053588146,
+          1.6571216727905718
+        ]
+      }
+    },
+    {
+      "seed": 130,
+      "steps": 99,
+      "found": true,
+      "reward": 20.09581403853147,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9262687997942094,
+      "visited_cells": 13,
+      "reward_components": {
+        "time": -4.899999999999991,
+        "exploration": 6.0,
+        "discovery": 19.02,
+        "boundary": 0.0,
+        "stagnation": -0.024185961468528916
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.2615235569470089,
+          -2.943097366251649
+        ],
+        "robot_xy": [
+          -2.5317969717497038,
+          -1.164350926217037
+        ],
+        "target_xy": [
+          -0.5576530756812219,
+          1.5199479863900285
+        ]
+      }
+    },
+    {
+      "seed": 131,
+      "steps": 2000,
+      "found": false,
+      "reward": -312.6550503061139,
+      "blocked_steps": 1731,
+      "stationary_steps": 746,
+      "mean_speed": 0.23622202156678912,
+      "visited_cells": 46,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 22.5,
+        "discovery": 0.0,
+        "boundary": -170.72936594953546,
+        "stagnation": -64.42568435657573
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.9132841559127405,
+          2.355039585989566
+        ],
+        "robot_xy": [
+          0.6068934960846963,
+          0.1940045226083651
+        ],
+        "target_xy": [
+          -2.1057458846770922,
+          -2.5092684095432407
+        ]
+      }
+    },
+    {
+      "seed": 132,
+      "steps": 1004,
+      "found": true,
+      "reward": -11.991269785011385,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.6748798369569708,
+      "visited_cells": 63,
+      "reward_components": {
+        "time": -50.14999999999929,
+        "exploration": 31.0,
+        "discovery": 9.97,
+        "boundary": 0.0,
+        "stagnation": -2.8112697850110844
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.6436250402009973,
+          2.821061609585418
+        ],
+        "robot_xy": [
+          1.8279950416089168,
+          1.4711042607526261
+        ],
+        "target_xy": [
+          0.6593394438878826,
+          0.22910852433873785
+        ]
+      }
+    },
+    {
+      "seed": 133,
+      "steps": 181,
+      "found": true,
+      "reward": 20.70000000000001,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0236189653459364,
+      "visited_cells": 24,
+      "reward_components": {
+        "time": -8.999999999999993,
+        "exploration": 11.5,
+        "discovery": 18.2,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.5723417805757858,
+          1.9366720731266227
+        ],
+        "robot_xy": [
+          0.07323190016698655,
+          -0.8349055090422066
+        ],
+        "target_xy": [
+          0.4573826051812597,
+          0.5887382133542274
+        ]
+      }
+    },
+    {
+      "seed": 134,
+      "steps": 41,
+      "found": true,
+      "reward": 20.6,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0658869223398715,
+      "visited_cells": 7,
+      "reward_components": {
+        "time": -2.000000000000001,
+        "exploration": 3.0,
+        "discovery": 19.6,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.7811135851825277,
+          1.504643607013051
+        ],
+        "robot_xy": [
+          0.02557731942372321,
+          0.2651125990010543
+        ],
+        "target_xy": [
+          1.6807121314041211,
+          -1.184387853150214
+        ]
+      }
+    },
+    {
+      "seed": 135,
+      "steps": 2000,
+      "found": false,
+      "reward": -71.18671657433484,
+      "blocked_steps": 19,
+      "stationary_steps": 0,
+      "mean_speed": 0.5529822902335806,
+      "visited_cells": 78,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 38.5,
+        "discovery": 0.0,
+        "boundary": -1.1736583256201776,
+        "stagnation": -8.513058248716545
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.893849070836155,
+          2.452724652329243
+        ],
+        "robot_xy": [
+          -1.3155060034991828,
+          2.4045175955963884
+        ],
+        "target_xy": [
+          2.9227171068979345,
+          -1.659526312862448
+        ]
+      }
+    },
+    {
+      "seed": 136,
+      "steps": 1,
+      "found": true,
+      "reward": 20.0,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0008142650901488,
+      "visited_cells": 1,
+      "reward_components": {
+        "time": 0.0,
+        "exploration": 0.0,
+        "discovery": 20.0,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.037020606906312814,
+          2.6735808240963452
+        ],
+        "robot_xy": [
+          -2.5786533426221308,
+          -2.301114762002494
+        ],
+        "target_xy": [
+          -0.76989423160129,
+          2.015888592846389
+        ]
+      }
+    },
+    {
+      "seed": 137,
+      "steps": 243,
+      "found": true,
+      "reward": 11.555950849673026,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.6605021058959393,
+      "visited_cells": 15,
+      "reward_components": {
+        "time": -12.100000000000037,
+        "exploration": 7.0,
+        "discovery": 17.58,
+        "boundary": 0.0,
+        "stagnation": -0.9240491503269876
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.14670315336014728,
+          0.4116111140176568
+        ],
+        "robot_xy": [
+          -1.3497255334142955,
+          -0.4382996035246327
+        ],
+        "target_xy": [
+          0.7519317900619993,
+          -0.19562174344031646
+        ]
+      }
+    },
+    {
+      "seed": 138,
+      "steps": 2000,
+      "found": false,
+      "reward": -73.01894902185828,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.5121699845255043,
+      "visited_cells": 72,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 35.5,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -8.518949021860113
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5537920089407082,
+          0.8980459434780843
+        ],
+        "robot_xy": [
+          1.7125236630236902,
+          0.3628634420381429
+        ],
+        "target_xy": [
+          2.6305047305865266,
+          2.1815703183969664
+        ]
+      }
+    },
+    {
+      "seed": 139,
+      "steps": 2000,
+      "found": false,
+      "reward": -250.00181575947553,
+      "blocked_steps": 1394,
+      "stationary_steps": 0,
+      "mean_speed": 0.34452595309606787,
+      "visited_cells": 43,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 21.0,
+        "discovery": 0.0,
+        "boundary": -136.45079551511157,
+        "stagnation": -34.5510202443602
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.4765662474944192,
+          1.6215075371499648
+        ],
+        "robot_xy": [
+          0.46842789151545894,
+          -2.1489398927040257
+        ],
+        "target_xy": [
+          -2.5554111063487657,
+          2.6986883797650387
+        ]
+      }
+    },
+    {
+      "seed": 140,
+      "steps": 703,
+      "found": true,
+      "reward": -2.1839889398407912,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.6067328830205457,
+      "visited_cells": 45,
+      "reward_components": {
+        "time": -35.10000000000014,
+        "exploration": 22.0,
+        "discovery": 12.98,
+        "boundary": 0.0,
+        "stagnation": -2.0639889398406406
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.3523566970579761,
+          -0.1877956748217482
+        ],
+        "robot_xy": [
+          0.7281108326785111,
+          1.242501488859732
+        ],
+        "target_xy": [
+          -1.6608831907186887,
+          0.6321281153206364
+        ]
+      }
+    },
+    {
+      "seed": 141,
+      "steps": 121,
+      "found": true,
+      "reward": 20.299999999999997,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9839400020096936,
+      "visited_cells": 16,
+      "reward_components": {
+        "time": -5.999999999999987,
+        "exploration": 7.5,
+        "discovery": 18.799999999999997,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.6021714581087645,
+          -0.6949176009194522
+        ],
+        "robot_xy": [
+          2.9841795234347765,
+          -2.988918313982536
+        ],
+        "target_xy": [
+          -1.9130560943064956,
+          0.23792773708178316
+        ]
+      }
+    },
+    {
+      "seed": 142,
+      "steps": 2000,
+      "found": false,
+      "reward": -77.45687248576255,
+      "blocked_steps": 46,
+      "stationary_steps": 0,
+      "mean_speed": 0.528066543918312,
+      "visited_cells": 71,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 35.0,
+        "discovery": 0.0,
+        "boundary": -3.104162576860734,
+        "stagnation": -9.352709908903476
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.4495156571871375,
+          -1.6323494029833376
+        ],
+        "robot_xy": [
+          -2.3550531451662495,
+          0.886986405286148
+        ],
+        "target_xy": [
+          2.7641889042970025,
+          1.621795315986061
+        ]
+      }
+    },
+    {
+      "seed": 143,
+      "steps": 278,
+      "found": true,
+      "reward": 16.999032433083894,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.7902061349447616,
+      "visited_cells": 29,
+      "reward_components": {
+        "time": -13.850000000000062,
+        "exploration": 14.0,
+        "discovery": 17.229999999999997,
+        "boundary": 0.0,
+        "stagnation": -0.3809675669161015
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.292188595640523,
+          -0.6788570852809261
+        ],
+        "robot_xy": [
+          2.860752603050118,
+          0.033923002572417094
+        ],
+        "target_xy": [
+          0.9257835462389128,
+          1.2466708945507365
+        ]
+      }
+    },
+    {
+      "seed": 144,
+      "steps": 184,
+      "found": true,
+      "reward": 22.020000000000007,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.073921377740815,
+      "visited_cells": 27,
+      "reward_components": {
+        "time": -9.149999999999995,
+        "exploration": 13.0,
+        "discovery": 18.169999999999998,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.9460471248279703,
+          -0.021044688153787128
+        ],
+        "robot_xy": [
+          -2.6418758007030725,
+          -1.2019493468661908
+        ],
+        "target_xy": [
+          -2.5661518647878903,
+          2.648875552106663
+        ]
+      }
+    },
+    {
+      "seed": 145,
+      "steps": 13,
+      "found": true,
+      "reward": 20.279999999999998,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9501392804366726,
+      "visited_cells": 3,
+      "reward_components": {
+        "time": -0.6,
+        "exploration": 1.0,
+        "discovery": 19.88,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.6236948785665124,
+          -1.4176067458089565
+        ],
+        "robot_xy": [
+          -1.3883944395090686,
+          2.2222079674959208
+        ],
+        "target_xy": [
+          1.088220700584369,
+          -1.3707357992781128
+        ]
+      }
+    },
+    {
+      "seed": 146,
+      "steps": 113,
+      "found": true,
+      "reward": 21.24810652755209,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.036112232565271,
+      "visited_cells": 17,
+      "reward_components": {
+        "time": -5.599999999999988,
+        "exploration": 8.0,
+        "discovery": 18.88,
+        "boundary": 0.0,
+        "stagnation": -0.03189347244790953
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.0470882472940524,
+          -2.326100485199378
+        ],
+        "robot_xy": [
+          -0.7257262117119057,
+          -0.45036315828316464
+        ],
+        "target_xy": [
+          -0.9635805830182194,
+          2.4266368499235016
+        ]
+      }
+    },
+    {
+      "seed": 147,
+      "steps": 668,
+      "found": true,
+      "reward": -20.566263459434218,
+      "blocked_steps": 143,
+      "stationary_steps": 0,
+      "mean_speed": 0.6185151466426437,
+      "visited_cells": 36,
+      "reward_components": {
+        "time": -33.35000000000024,
+        "exploration": 17.5,
+        "discovery": 13.33,
+        "boundary": -13.620149834806574,
+        "stagnation": -4.426113624627852
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.303465829744224,
+          -2.399744341034146
+        ],
+        "robot_xy": [
+          1.6927144384693564,
+          0.7981628159751355
+        ],
+        "target_xy": [
+          0.3006651362734285,
+          1.6522738580367893
+        ]
+      }
+    },
+    {
+      "seed": 148,
+      "steps": 84,
+      "found": true,
+      "reward": 19.020000000000003,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.009419269860746,
+      "visited_cells": 9,
+      "reward_components": {
+        "time": -4.149999999999993,
+        "exploration": 4.0,
+        "discovery": 19.17,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.6649466075514594,
+          2.159402567982333
+        ],
+        "robot_xy": [
+          0.29980285015220387,
+          1.4318970225317615
+        ],
+        "target_xy": [
+          1.022864939942803,
+          -0.6819920150841368
+        ]
+      }
+    },
+    {
+      "seed": 149,
+      "steps": 1624,
+      "found": true,
+      "reward": -50.15833131521718,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.5565958364460241,
+      "visited_cells": 68,
+      "reward_components": {
+        "time": -81.14999999999753,
+        "exploration": 33.5,
+        "discovery": 3.77,
+        "boundary": 0.0,
+        "stagnation": -6.278331315218893
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.809240005599667,
+          -0.06163260333976339
+        ],
+        "robot_xy": [
+          -1.433347048951526,
+          -1.6705630841481245
+        ],
+        "target_xy": [
+          1.4307117963355855,
+          -0.25519189864220726
+        ]
+      }
+    },
+    {
+      "seed": 150,
+      "steps": 214,
+      "found": true,
+      "reward": 22.22000000000001,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.120646066053838,
+      "visited_cells": 31,
+      "reward_components": {
+        "time": -10.650000000000016,
+        "exploration": 15.0,
+        "discovery": 17.869999999999997,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.3935753655368508,
+          1.947883448713423
+        ],
+        "robot_xy": [
+          2.5847221062195302,
+          1.7074932658903323
+        ],
+        "target_xy": [
+          -0.9940502443534722,
+          1.1176135061170847
+        ]
+      }
+    },
+    {
+      "seed": 151,
+      "steps": 337,
+      "found": true,
+      "reward": 15.622922993606359,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.812605678974286,
+      "visited_cells": 33,
+      "reward_components": {
+        "time": -16.800000000000104,
+        "exploration": 16.0,
+        "discovery": 16.64,
+        "boundary": 0.0,
+        "stagnation": -0.21707700639363228
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.1257086446154556,
+          -2.958818836353383
+        ],
+        "robot_xy": [
+          -0.8391509810795439,
+          1.2564602926570405
+        ],
+        "target_xy": [
+          1.1370642999913656,
+          -0.16570949148239178
+        ]
+      }
+    },
+    {
+      "seed": 152,
+      "steps": 921,
+      "found": true,
+      "reward": -16.275246992415887,
+      "blocked_steps": 81,
+      "stationary_steps": 0,
+      "mean_speed": 0.6562727217727079,
+      "visited_cells": 58,
+      "reward_components": {
+        "time": -45.999999999999524,
+        "exploration": 28.5,
+        "discovery": 10.8,
+        "boundary": -5.2190466655150125,
+        "stagnation": -4.356200326900644
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.7343220305298077,
+          2.474023279646489
+        ],
+        "robot_xy": [
+          -1.4364926716829771,
+          -2.7032879563382495
+        ],
+        "target_xy": [
+          0.2315952676287658,
+          0.2524238439992019
+        ]
+      }
+    },
+    {
+      "seed": 153,
+      "steps": 1,
+      "found": true,
+      "reward": 20.0,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.4894246969020247,
+      "visited_cells": 1,
+      "reward_components": {
+        "time": 0.0,
+        "exploration": 0.0,
+        "discovery": 20.0,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.6994235790015146,
+          -0.6866957354806846
+        ],
+        "robot_xy": [
+          0.26429082912430335,
+          -2.3341123454832218
+        ],
+        "target_xy": [
+          2.1395824576724536,
+          -0.7070567150530183
+        ]
+      }
+    },
+    {
+      "seed": 154,
+      "steps": 527,
+      "found": true,
+      "reward": -31.471284393541772,
+      "blocked_steps": 238,
+      "stationary_steps": 0,
+      "mean_speed": 0.652928024502652,
+      "visited_cells": 40,
+      "reward_components": {
+        "time": -26.30000000000024,
+        "exploration": 19.5,
+        "discovery": 14.74,
+        "boundary": -35.714115942913494,
+        "stagnation": -3.6971684506288836
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.525893158147473,
+          0.15544938902792804
+        ],
+        "robot_xy": [
+          0.9568194522062603,
+          -1.7738061437255814
+        ],
+        "target_xy": [
+          -1.8043317264489804,
+          2.443502416522657
+        ]
+      }
+    },
+    {
+      "seed": 155,
+      "steps": 6,
+      "found": true,
+      "reward": 20.200000000000003,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0348050456279687,
+      "visited_cells": 2,
+      "reward_components": {
+        "time": -0.25,
+        "exploration": 0.5,
+        "discovery": 19.950000000000003,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.347003206997786,
+          -1.733803336615696
+        ],
+        "robot_xy": [
+          1.9835221487665784,
+          -0.8286285527017005
+        ],
+        "target_xy": [
+          0.8612328497646868,
+          -1.5166173049658958
+        ]
+      }
+    },
+    {
+      "seed": 156,
+      "steps": 856,
+      "found": true,
+      "reward": -16.570176931677096,
+      "blocked_steps": 188,
+      "stationary_steps": 0,
+      "mean_speed": 0.6812366138827423,
+      "visited_cells": 63,
+      "reward_components": {
+        "time": -42.74999999999971,
+        "exploration": 31.0,
+        "discovery": 11.45,
+        "boundary": -12.85607421284721,
+        "stagnation": -3.4141027188296698
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.5335330866629615,
+          2.5945437984051996
+        ],
+        "robot_xy": [
+          -2.973232277578397,
+          -2.4162375902991515
+        ],
+        "target_xy": [
+          -2.56016954386585,
+          -1.4655388438062713
+        ]
+      }
+    },
+    {
+      "seed": 157,
+      "steps": 394,
+      "found": true,
+      "reward": -34.55201621929806,
+      "blocked_steps": 251,
+      "stationary_steps": 0,
+      "mean_speed": 0.42115868698771525,
+      "visited_cells": 16,
+      "reward_components": {
+        "time": -19.650000000000144,
+        "exploration": 7.5,
+        "discovery": 16.07,
+        "boundary": -32.719405006948705,
+        "stagnation": -5.752611212349795
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.416550262052631,
+          -2.8259434992402905
+        ],
+        "robot_xy": [
+          2.171891534947143,
+          -0.6363318719548832
+        ],
+        "target_xy": [
+          -1.8257407256795575,
+          -1.0152828569058405
+        ]
+      }
+    },
+    {
+      "seed": 158,
+      "steps": 2000,
+      "found": false,
+      "reward": -77.29174264417398,
+      "blocked_steps": 95,
+      "stationary_steps": 0,
+      "mean_speed": 0.5035616545827951,
+      "visited_cells": 86,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 42.5,
+        "discovery": 0.0,
+        "boundary": -5.070141346355001,
+        "stagnation": -14.72160129781983
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.913491129274262,
+          -0.9180046231185619
+        ],
+        "robot_xy": [
+          1.6729062936175758,
+          0.5701736719975559
+        ],
+        "target_xy": [
+          0.5677223716605955,
+          1.4609500383448548
+        ]
+      }
+    },
+    {
+      "seed": 159,
+      "steps": 1,
+      "found": true,
+      "reward": 20.0,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.140356673182712,
+      "visited_cells": 1,
+      "reward_components": {
+        "time": 0.0,
+        "exploration": 0.0,
+        "discovery": 20.0,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.7014257123364596,
+          2.9989888981646073
+        ],
+        "robot_xy": [
+          0.45841315961784534,
+          -0.8342272830938633
+        ],
+        "target_xy": [
+          -1.26158495091007,
+          2.941320083998681
+        ]
+      }
+    },
+    {
+      "seed": 160,
+      "steps": 1155,
+      "found": true,
+      "reward": -46.36486911749343,
+      "blocked_steps": 226,
+      "stationary_steps": 0,
+      "mean_speed": 0.49658293538155274,
+      "visited_cells": 49,
+      "reward_components": {
+        "time": -57.69999999999886,
+        "exploration": 24.0,
+        "discovery": 8.46,
+        "boundary": -13.499120624929912,
+        "stagnation": -7.625748492564708
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.8215249665639082,
+          -0.8838237361965326
+        ],
+        "robot_xy": [
+          0.5395955071721925,
+          -0.8627213409702605
+        ],
+        "target_xy": [
+          0.8567410293323778,
+          0.7996039164358422
+        ]
+      }
+    },
+    {
+      "seed": 161,
+      "steps": 13,
+      "found": true,
+      "reward": 19.779999999999998,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0708459090958369,
+      "visited_cells": 2,
+      "reward_components": {
+        "time": -0.6,
+        "exploration": 0.5,
+        "discovery": 19.88,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.9613124279754892,
+          1.752219489590603
+        ],
+        "robot_xy": [
+          1.339647138401105,
+          -1.5732515704866163
+        ],
+        "target_xy": [
+          -1.433116085002434,
+          0.5252456482104702
+        ]
+      }
+    },
+    {
+      "seed": 162,
+      "steps": 1335,
+      "found": true,
+      "reward": -46.0484665967078,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.49283391123440556,
+      "visited_cells": 42,
+      "reward_components": {
+        "time": -66.69999999999835,
+        "exploration": 20.5,
+        "discovery": 6.659999999999999,
+        "boundary": 0.0,
+        "stagnation": -6.508466596708361
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5684766374621413,
+          -1.5510281660570604
+        ],
+        "robot_xy": [
+          -1.5998169879072879,
+          0.8690355507256915
+        ],
+        "target_xy": [
+          1.8819215294825042,
+          -2.9743064147502043
+        ]
+      }
+    },
+    {
+      "seed": 163,
+      "steps": 207,
+      "found": true,
+      "reward": 18.100550072814986,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9088139490216384,
+      "visited_cells": 22,
+      "reward_components": {
+        "time": -10.300000000000011,
+        "exploration": 10.5,
+        "discovery": 17.94,
+        "boundary": 0.0,
+        "stagnation": -0.03944992718501218
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.01837172960029232,
+          -0.7872039945316232
+        ],
+        "robot_xy": [
+          -2.8362638563243783,
+          0.4076983535896037
+        ],
+        "target_xy": [
+          1.7896917212073244,
+          -1.5080245652497914
+        ]
+      }
+    },
+    {
+      "seed": 164,
+      "steps": 119,
+      "found": true,
+      "reward": 19.904775942968865,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9395346885246725,
+      "visited_cells": 15,
+      "reward_components": {
+        "time": -5.899999999999987,
+        "exploration": 7.0,
+        "discovery": 18.82,
+        "boundary": 0.0,
+        "stagnation": -0.015224057031135208
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.789680860839832,
+          0.2068418317944749
+        ],
+        "robot_xy": [
+          -0.8669345759073543,
+          -0.8008436018670277
+        ],
+        "target_xy": [
+          -2.0337475243208303,
+          -1.954263899044403
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "steps": 2000,
+      "found": false,
+      "reward": -75.27573716198577,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.4743034443524974,
+      "visited_cells": 73,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 36.0,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -11.275737161987635
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.29029186655575,
+          -2.323053923930345
+        ],
+        "robot_xy": [
+          0.4643554853504064,
+          1.6253296467461196
+        ],
+        "target_xy": [
+          2.6557255398857045,
+          2.1520004784281177
+        ]
+      }
+    },
+    {
+      "seed": 166,
+      "steps": 180,
+      "found": true,
+      "reward": 21.260000000000005,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0320872718670973,
+      "visited_cells": 25,
+      "reward_components": {
+        "time": -8.949999999999992,
+        "exploration": 12.0,
+        "discovery": 18.21,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.0370442621764067,
+          -0.3898267565773028
+        ],
+        "robot_xy": [
+          -1.983606332373026,
+          1.2316593578877857
+        ],
+        "target_xy": [
+          -1.612794440612434,
+          2.6541012251926404
+        ]
+      }
+    },
+    {
+      "seed": 167,
+      "steps": 1238,
+      "found": true,
+      "reward": -50.546444260032956,
+      "blocked_steps": 211,
+      "stationary_steps": 0,
+      "mean_speed": 0.4898505298108872,
+      "visited_cells": 59,
+      "reward_components": {
+        "time": -61.84999999999862,
+        "exploration": 29.0,
+        "discovery": 7.629999999999999,
+        "boundary": -14.938597802740006,
+        "stagnation": -10.387846457293879
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.7361464016217631,
+          -0.7671709840004732
+        ],
+        "robot_xy": [
+          0.8970105112429465,
+          0.4445363620317533
+        ],
+        "target_xy": [
+          -2.0652556683033563,
+          1.7785325609196319
+        ]
+      }
+    },
+    {
+      "seed": 168,
+      "steps": 415,
+      "found": true,
+      "reward": 6.7370891684755865,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.6397563690841668,
+      "visited_cells": 28,
+      "reward_components": {
+        "time": -20.70000000000016,
+        "exploration": 13.5,
+        "discovery": 15.860000000000001,
+        "boundary": 0.0,
+        "stagnation": -1.9229108315243737
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.9129385943490504,
+          -2.442887380933966
+        ],
+        "robot_xy": [
+          -2.7670798495728413,
+          1.9031958456925766
+        ],
+        "target_xy": [
+          1.8394211013950512,
+          0.6121490153017328
+        ]
+      }
+    },
+    {
+      "seed": 169,
+      "steps": 2000,
+      "found": false,
+      "reward": -78.01546324883235,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.47041157308118386,
+      "visited_cells": 69,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 34.0,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -12.015463248833823
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.7747885805952666,
+          1.6971074362626597
+        ],
+        "robot_xy": [
+          1.5737410400360439,
+          -0.237604741160113
+        ],
+        "target_xy": [
+          1.2494070237598445,
+          -1.7999558563032936
+        ]
+      }
+    },
+    {
+      "seed": 170,
+      "steps": 2000,
+      "found": false,
+      "reward": -226.26875892927345,
+      "blocked_steps": 1253,
+      "stationary_steps": 64,
+      "mean_speed": 0.3499721612721731,
+      "visited_cells": 57,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 28.0,
+        "discovery": 0.0,
+        "boundary": -118.12806175328511,
+        "stagnation": -36.14069717598609
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.840182374825199,
+          -2.831575926947631
+        ],
+        "robot_xy": [
+          2.750737609282922,
+          2.1549043571131676
+        ],
+        "target_xy": [
+          2.787350323490423,
+          -1.8828549143169582
+        ]
+      }
+    },
+    {
+      "seed": 171,
+      "steps": 109,
+      "found": true,
+      "reward": 20.519999999999996,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.031591558271334,
+      "visited_cells": 15,
+      "reward_components": {
+        "time": -5.399999999999989,
+        "exploration": 7.0,
+        "discovery": 18.919999999999998,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.29446247540840353,
+          -0.6422760937491141
+        ],
+        "robot_xy": [
+          1.5540938075333663,
+          0.25439306276886153
+        ],
+        "target_xy": [
+          -1.3696787835461153,
+          1.928539211710163
+        ]
+      }
+    },
+    {
+      "seed": 172,
+      "steps": 4,
+      "found": true,
+      "reward": 20.320000000000004,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.062672590108879,
+      "visited_cells": 2,
+      "reward_components": {
+        "time": -0.15000000000000002,
+        "exploration": 0.5,
+        "discovery": 19.970000000000002,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.7812044549503039,
+          -0.47110818250078523
+        ],
+        "robot_xy": [
+          2.5385266664665442,
+          0.5263745743694086
+        ],
+        "target_xy": [
+          -1.1612462577353362,
+          -0.14930788582877552
+        ]
+      }
+    },
+    {
+      "seed": 173,
+      "steps": 225,
+      "found": true,
+      "reward": 21.046379134570557,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0238948013798608,
+      "visited_cells": 30,
+      "reward_components": {
+        "time": -11.200000000000024,
+        "exploration": 14.5,
+        "discovery": 17.76,
+        "boundary": 0.0,
+        "stagnation": -0.013620865429451946
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.6573741686234502,
+          2.335892164695899
+        ],
+        "robot_xy": [
+          0.037126543106639875,
+          -1.3195410397903027
+        ],
+        "target_xy": [
+          0.802659668856708,
+          1.764721377378141
+        ]
+      }
+    },
+    {
+      "seed": 174,
+      "steps": 1673,
+      "found": true,
+      "reward": -61.07653655180249,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.4788326398828358,
+      "visited_cells": 58,
+      "reward_components": {
+        "time": -83.5999999999974,
+        "exploration": 28.5,
+        "discovery": 3.2800000000000007,
+        "boundary": 0.0,
+        "stagnation": -9.256536551803617
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.2379750662943283,
+          2.8143842625484847
+        ],
+        "robot_xy": [
+          1.9946889770836478,
+          2.535852692038133
+        ],
+        "target_xy": [
+          -0.527892778841057,
+          -2.3226007318496107
+        ]
+      }
+    },
+    {
+      "seed": 175,
+      "steps": 1048,
+      "found": true,
+      "reward": -15.615240992307523,
+      "blocked_steps": 37,
+      "stationary_steps": 0,
+      "mean_speed": 0.6737156235008802,
+      "visited_cells": 65,
+      "reward_components": {
+        "time": -52.34999999999916,
+        "exploration": 32.0,
+        "discovery": 9.530000000000001,
+        "boundary": -2.69701650554083,
+        "stagnation": -2.0982244867662994
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.1103978450987741,
+          1.8311399094092504
+        ],
+        "robot_xy": [
+          0.1580760526099665,
+          -2.553698352053827
+        ],
+        "target_xy": [
+          -2.740516621968723,
+          -2.330031270629782
+        ]
+      }
+    },
+    {
+      "seed": 176,
+      "steps": 1957,
+      "found": true,
+      "reward": -79.08075188826732,
+      "blocked_steps": 37,
+      "stationary_steps": 0,
+      "mean_speed": 0.5074870371744676,
+      "visited_cells": 64,
+      "reward_components": {
+        "time": -97.79999999999659,
+        "exploration": 31.5,
+        "discovery": 0.4400000000000004,
+        "boundary": -2.004291939912278,
+        "stagnation": -11.216459948357151
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.8410956879915847,
+          1.9192327188203002
+        ],
+        "robot_xy": [
+          -2.1115126177388515,
+          2.5897305142405056
+        ],
+        "target_xy": [
+          2.214376615228595,
+          1.9312339636281592
+        ]
+      }
+    },
+    {
+      "seed": 177,
+      "steps": 2000,
+      "found": false,
+      "reward": -73.35585816579368,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.49249680343416324,
+      "visited_cells": 76,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 37.5,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -10.855858165795507
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.990980038120416,
+          1.7320251233291213
+        ],
+        "robot_xy": [
+          -1.1190864103349214,
+          0.5571275497436736
+        ],
+        "target_xy": [
+          0.23309757567369438,
+          1.9249334329790466
+        ]
+      }
+    },
+    {
+      "seed": 178,
+      "steps": 56,
+      "found": true,
+      "reward": 19.7,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9624267506267216,
+      "visited_cells": 7,
+      "reward_components": {
+        "time": -2.7499999999999982,
+        "exploration": 3.0,
+        "discovery": 19.45,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.5673020662047654,
+          1.8217308874234917
+        ],
+        "robot_xy": [
+          -2.721539174494197,
+          -2.980374677372777
+        ],
+        "target_xy": [
+          1.5630021217961962,
+          -1.3382809149966768
+        ]
+      }
+    },
+    {
+      "seed": 179,
+      "steps": 196,
+      "found": true,
+      "reward": 16.598609635532046,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.7476491578146612,
+      "visited_cells": 18,
+      "reward_components": {
+        "time": -9.750000000000004,
+        "exploration": 8.5,
+        "discovery": 18.05,
+        "boundary": 0.0,
+        "stagnation": -0.20139036446795042
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.148877471500566,
+          -1.075877847277473
+        ],
+        "robot_xy": [
+          2.6423613342546943,
+          2.766867523520375
+        ],
+        "target_xy": [
+          -2.23035865644731,
+          1.4063126894316849
+        ]
+      }
+    },
+    {
+      "seed": 180,
+      "steps": 38,
+      "found": true,
+      "reward": 20.28,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9948764276915452,
+      "visited_cells": 6,
+      "reward_components": {
+        "time": -1.850000000000001,
+        "exploration": 2.5,
+        "discovery": 19.630000000000003,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.16376263319726814,
+          -1.2163204950798072
+        ],
+        "robot_xy": [
+          1.0086360996178634,
+          0.31961724173247985
+        ],
+        "target_xy": [
+          -1.7532731868287301,
+          -1.9334195985802516
+        ]
+      }
+    },
+    {
+      "seed": 181,
+      "steps": 539,
+      "found": true,
+      "reward": 3.953754401353118,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.6738471804084838,
+      "visited_cells": 37,
+      "reward_components": {
+        "time": -26.900000000000247,
+        "exploration": 18.0,
+        "discovery": 14.62,
+        "boundary": 0.0,
+        "stagnation": -1.7662455986469114
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.26261136033400767,
+          1.599174986154412
+        ],
+        "robot_xy": [
+          0.5345415611343336,
+          -0.30452428768962037
+        ],
+        "target_xy": [
+          0.6132248984196504,
+          2.3127972628035227
+        ]
+      }
+    },
+    {
+      "seed": 182,
+      "steps": 167,
+      "found": true,
+      "reward": 17.47262578788888,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.949042151477294,
+      "visited_cells": 16,
+      "reward_components": {
+        "time": -8.299999999999983,
+        "exploration": 7.5,
+        "discovery": 18.34,
+        "boundary": 0.0,
+        "stagnation": -0.06737421211111479
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.256445646294555,
+          0.4272076469234509
+        ],
+        "robot_xy": [
+          -1.0892204031661386,
+          -0.14949660734099446
+        ],
+        "target_xy": [
+          -1.213110718966091,
+          1.731859546021961
+        ]
+      }
+    },
+    {
+      "seed": 183,
+      "steps": 199,
+      "found": true,
+      "reward": 22.62000000000001,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0567919023899521,
+      "visited_cells": 30,
+      "reward_components": {
+        "time": -9.900000000000006,
+        "exploration": 14.5,
+        "discovery": 18.02,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.4758369721087004,
+          2.153197886460937
+        ],
+        "robot_xy": [
+          2.415791226878641,
+          1.132234641706959
+        ],
+        "target_xy": [
+          -2.5216987251382452,
+          1.630051754861137
+        ]
+      }
+    },
+    {
+      "seed": 184,
+      "steps": 2000,
+      "found": false,
+      "reward": -79.97098803245291,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.4765141392310034,
+      "visited_cells": 65,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 32.0,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -11.970988032453944
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.5760596977883963,
+          -0.6508752180495607
+        ],
+        "robot_xy": [
+          0.5019392734311179,
+          2.2800948130844283
+        ],
+        "target_xy": [
+          1.3063998205507588,
+          1.8141819684892617
+        ]
+      }
+    },
+    {
+      "seed": 185,
+      "steps": 102,
+      "found": true,
+      "reward": 16.13070695995658,
+      "blocked_steps": 23,
+      "stationary_steps": 0,
+      "mean_speed": 0.6842428253150346,
+      "visited_cells": 8,
+      "reward_components": {
+        "time": -5.04999999999999,
+        "exploration": 3.5,
+        "discovery": 18.990000000000002,
+        "boundary": -1.0773360627563342,
+        "stagnation": -0.2319569772870962
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.908976541888742,
+          -2.851539966262636
+        ],
+        "robot_xy": [
+          0.22016703696174078,
+          -0.8345734855796887
+        ],
+        "target_xy": [
+          -0.6925391801236764,
+          -1.064131353108339
+        ]
+      }
+    },
+    {
+      "seed": 186,
+      "steps": 263,
+      "found": true,
+      "reward": 20.167172640623285,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.9051792864106616,
+      "visited_cells": 33,
+      "reward_components": {
+        "time": -13.100000000000051,
+        "exploration": 16.0,
+        "discovery": 17.38,
+        "boundary": 0.0,
+        "stagnation": -0.11282735937674362
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.7260637031954538,
+          -1.4604691514285797
+        ],
+        "robot_xy": [
+          0.8084691293288779,
+          2.2337680050457953
+        ],
+        "target_xy": [
+          1.3269314869339572,
+          0.6602883088967086
+        ]
+      }
+    },
+    {
+      "seed": 187,
+      "steps": 218,
+      "found": true,
+      "reward": 18.320882806679748,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.8746082687698405,
+      "visited_cells": 24,
+      "reward_components": {
+        "time": -10.85000000000002,
+        "exploration": 11.5,
+        "discovery": 17.83,
+        "boundary": 0.0,
+        "stagnation": -0.159117193320245
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.4615378405817534,
+          1.101535603446412
+        ],
+        "robot_xy": [
+          -0.8993903367017047,
+          0.02983608871431276
+        ],
+        "target_xy": [
+          -1.177435696515054,
+          2.115284926411239
+        ]
+      }
+    },
+    {
+      "seed": 188,
+      "steps": 355,
+      "found": true,
+      "reward": 12.748504289743597,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.8085963869307785,
+      "visited_cells": 30,
+      "reward_components": {
+        "time": -17.700000000000117,
+        "exploration": 14.5,
+        "discovery": 16.46,
+        "boundary": 0.0,
+        "stagnation": -0.5114957102564074
+      },
+      "initial_state": {
+        "drone_xy": [
+          -0.3989096501084224,
+          1.096656124539308
+        ],
+        "robot_xy": [
+          1.3174443071371753,
+          2.0247486176250566
+        ],
+        "target_xy": [
+          0.6740411702284708,
+          1.3433967674985912
+        ]
+      }
+    },
+    {
+      "seed": 189,
+      "steps": 2000,
+      "found": false,
+      "reward": -288.92705487782627,
+      "blocked_steps": 1487,
+      "stationary_steps": 0,
+      "mean_speed": 0.29592247309245395,
+      "visited_cells": 36,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 17.5,
+        "discovery": 0.0,
+        "boundary": -169.82726849441076,
+        "stagnation": -36.59978638340878
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.8347578547463455,
+          -1.8560034098086022
+        ],
+        "robot_xy": [
+          -2.1561749779421753,
+          -0.23729540237061642
+        ],
+        "target_xy": [
+          1.9636002476136767,
+          -2.155582308319305
+        ]
+      }
+    },
+    {
+      "seed": 190,
+      "steps": 2000,
+      "found": false,
+      "reward": -92.49918833341397,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.42689559580328545,
+      "visited_cells": 48,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 23.5,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -15.999188333415116
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.336163708843186,
+          0.6871834444372107
+        ],
+        "robot_xy": [
+          -2.501213022449871,
+          2.9421712833615743
+        ],
+        "target_xy": [
+          0.9229359952904401,
+          0.532385871460261
+        ]
+      }
+    },
+    {
+      "seed": 191,
+      "steps": 91,
+      "found": true,
+      "reward": 20.099999999999998,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0800798216373122,
+      "visited_cells": 12,
+      "reward_components": {
+        "time": -4.499999999999992,
+        "exploration": 5.5,
+        "discovery": 19.099999999999998,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          1.124148213405241,
+          -1.253373698727105
+        ],
+        "robot_xy": [
+          1.7594986555426688,
+          -2.394050819152074
+        ],
+        "target_xy": [
+          -0.604992250335342,
+          0.5469946148974447
+        ]
+      }
+    },
+    {
+      "seed": 192,
+      "steps": 134,
+      "found": true,
+      "reward": 21.514659008022832,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0671140942415984,
+      "visited_cells": 20,
+      "reward_components": {
+        "time": -6.649999999999984,
+        "exploration": 9.5,
+        "discovery": 18.67,
+        "boundary": 0.0,
+        "stagnation": -0.005340991977174931
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.9001605949195772,
+          -1.396691950849883
+        ],
+        "robot_xy": [
+          0.634348539697716,
+          -2.9445339215983655
+        ],
+        "target_xy": [
+          -2.431426561540655,
+          2.781372057106931
+        ]
+      }
+    },
+    {
+      "seed": 193,
+      "steps": 456,
+      "found": true,
+      "reward": 7.51994842572502,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.7557892077233149,
+      "visited_cells": 32,
+      "reward_components": {
+        "time": -22.75000000000019,
+        "exploration": 15.5,
+        "discovery": 15.45,
+        "boundary": 0.0,
+        "stagnation": -0.6800515742750041
+      },
+      "initial_state": {
+        "drone_xy": [
+          0.2786466208975278,
+          -0.09927722581182774
+        ],
+        "robot_xy": [
+          -1.4888602930563675,
+          1.2226918995115383
+        ],
+        "target_xy": [
+          -2.2133379880343167,
+          -2.604586625739631
+        ]
+      }
+    },
+    {
+      "seed": 194,
+      "steps": 2000,
+      "found": false,
+      "reward": -88.48449231289554,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.4169089997690749,
+      "visited_cells": 57,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 28.0,
+        "discovery": 0.0,
+        "boundary": 0.0,
+        "stagnation": -16.484492312896638
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.7362631055811333,
+          -1.182780365965243
+        ],
+        "robot_xy": [
+          2.1955618889531117,
+          -1.4229223207689456
+        ],
+        "target_xy": [
+          -0.11060908871008923,
+          -0.20831331188680258
+        ]
+      }
+    },
+    {
+      "seed": 195,
+      "steps": 119,
+      "found": true,
+      "reward": 18.351540039401048,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.8103625505967202,
+      "visited_cells": 12,
+      "reward_components": {
+        "time": -5.899999999999987,
+        "exploration": 5.5,
+        "discovery": 18.82,
+        "boundary": 0.0,
+        "stagnation": -0.0684599605989484
+      },
+      "initial_state": {
+        "drone_xy": [
+          -1.973866937843288,
+          -2.0031606063159497
+        ],
+        "robot_xy": [
+          -2.4945535415340263,
+          1.7021899019306836
+        ],
+        "target_xy": [
+          -1.1947559844402387,
+          0.6370381261044313
+        ]
+      }
+    },
+    {
+      "seed": 196,
+      "steps": 2000,
+      "found": false,
+      "reward": -89.86352741274376,
+      "blocked_steps": 62,
+      "stationary_steps": 0,
+      "mean_speed": 0.4902747545786795,
+      "visited_cells": 65,
+      "reward_components": {
+        "time": -99.99999999999646,
+        "exploration": 32.0,
+        "discovery": 0.0,
+        "boundary": -10.605990855982816,
+        "stagnation": -11.257536556762416
+      },
+      "initial_state": {
+        "drone_xy": [
+          -2.9216837035584504,
+          -2.5331654988241636
+        ],
+        "robot_xy": [
+          -0.49769132115570525,
+          1.363039375331148
+        ],
+        "target_xy": [
+          2.557934016631327,
+          -2.3300264290663604
+        ]
+      }
+    },
+    {
+      "seed": 197,
+      "steps": 107,
+      "found": true,
+      "reward": 20.139999999999997,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0151143504381754,
+      "visited_cells": 14,
+      "reward_components": {
+        "time": -5.299999999999989,
+        "exploration": 6.5,
+        "discovery": 18.939999999999998,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.3107735525461806,
+          2.8968945052841146
+        ],
+        "robot_xy": [
+          1.7125655922612193,
+          1.7973802056230426
+        ],
+        "target_xy": [
+          0.4274276371103909,
+          -1.0713552099120967
+        ]
+      }
+    },
+    {
+      "seed": 198,
+      "steps": 601,
+      "found": true,
+      "reward": 5.118684196392886,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 0.7188951922427356,
+      "visited_cells": 45,
+      "reward_components": {
+        "time": -30.00000000000029,
+        "exploration": 22.0,
+        "discovery": 14.0,
+        "boundary": 0.0,
+        "stagnation": -0.8813158036071256
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.4046540535081222,
+          -0.24807809240022038
+        ],
+        "robot_xy": [
+          1.9294087284844226,
+          -2.4759140936140787
+        ],
+        "target_xy": [
+          0.4166814806555541,
+          1.711016114769226
+        ]
+      }
+    },
+    {
+      "seed": 199,
+      "steps": 102,
+      "found": true,
+      "reward": 20.94,
+      "blocked_steps": 0,
+      "stationary_steps": 0,
+      "mean_speed": 1.0722524230633186,
+      "visited_cells": 15,
+      "reward_components": {
+        "time": -5.04999999999999,
+        "exploration": 7.0,
+        "discovery": 18.990000000000002,
+        "boundary": 0.0,
+        "stagnation": 0.0
+      },
+      "initial_state": {
+        "drone_xy": [
+          2.987518766093334,
+          -1.458985775726676
+        ],
+        "robot_xy": [
+          0.6416698958440596,
+          -2.546469545452865
+        ],
+        "target_xy": [
+          -2.1964655047248227,
+          0.29035762202111837
+        ]
+      }
+    }
+  ]
+}

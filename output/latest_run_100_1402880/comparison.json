@@ -1,0 +1,149 @@
+{
+  "seed_start": 100,
+  "seed_end": 199,
+  "episodes_per_model": 100,
+  "initial_scenarios_verified_identical": true,
+  "previous_200k_results_reproduced_exactly": true,
+  "summaries": {
+    "previous_200k_final": {
+      "found": 76,
+      "episodes": 100,
+      "mean_reward": -18.445078901268754,
+      "mean_steps": 807.99,
+      "mean_discovery_steps_when_found": 431.5657894736842,
+      "mean_speed": 0.5496673900515695,
+      "blocked_step_percent": 3.500043317367789,
+      "stationary_step_percent": 0.0,
+      "mean_visited_cells": 32.32,
+      "mean_reward_components": {
+        "time": -40.36149999999891,
+        "exploration": 15.66,
+        "discovery": 11.9277,
+        "boundary": -2.091823542293224,
+        "stagnation": -3.579455358976056
+      }
+    },
+    "latest_best": {
+      "found": 81,
+      "episodes": 100,
+      "mean_reward": -21.731415699995633,
+      "mean_steps": 706.93,
+      "mean_discovery_steps_when_found": 403.61728395061726,
+      "mean_speed": 0.5269614999002669,
+      "blocked_step_percent": 13.395951508635934,
+      "stationary_step_percent": 1.9322988131781083,
+      "mean_visited_cells": 32.39,
+      "mean_reward_components": {
+        "time": -35.305999999999116,
+        "exploration": 15.695,
+        "discovery": 12.938799999999999,
+        "boundary": -9.720509299163822,
+        "stagnation": -5.338706400831975
+      }
+    },
+    "latest_final": {
+      "found": 67,
+      "episodes": 100,
+      "mean_reward": -41.58384194057635,
+      "mean_steps": 910.71,
+      "mean_discovery_steps_when_found": 374.1940298507463,
+      "mean_speed": 0.4134907577248285,
+      "blocked_step_percent": 17.78941704823709,
+      "stationary_step_percent": 3.161269778524448,
+      "mean_visited_cells": 34.23,
+      "mean_reward_components": {
+        "time": -45.501999999998716,
+        "exploration": 16.615,
+        "discovery": 10.8996,
+        "boundary": -11.530530442139966,
+        "stagnation": -12.06591149843654
+      }
+    }
+  },
+  "paired_comparisons": {
+    "latest_best_vs_previous_200k_final": {
+      "gained_successes": 13,
+      "lost_successes": 8,
+      "exact_mcnemar_p": 0.38331031799316406,
+      "metrics": {
+        "found": {
+          "mean_difference": 0.05,
+          "paired_bootstrap_95_interval": [
+            -0.04,
+            0.14
+          ]
+        },
+        "reward": {
+          "mean_difference": -3.286336798726876,
+          "paired_bootstrap_95_interval": [
+            -17.117841814537627,
+            9.4436525933223
+          ]
+        },
+        "steps": {
+          "mean_difference": -101.06,
+          "paired_bootstrap_95_interval": [
+            -250.4705,
+            51.53049999999996
+          ]
+        }
+      }
+    },
+    "latest_final_vs_previous_200k_final": {
+      "gained_successes": 9,
+      "lost_successes": 18,
+      "exact_mcnemar_p": 0.12207812070846558,
+      "metrics": {
+        "found": {
+          "mean_difference": -0.09,
+          "paired_bootstrap_95_interval": [
+            -0.19,
+            0.01
+          ]
+        },
+        "reward": {
+          "mean_difference": -23.138763039307594,
+          "paired_bootstrap_95_interval": [
+            -36.662709153247135,
+            -9.972228752662197
+          ]
+        },
+        "steps": {
+          "mean_difference": 102.72,
+          "paired_bootstrap_95_interval": [
+            -51.8315,
+            257.3522499999998
+          ]
+        }
+      }
+    },
+    "latest_best_vs_latest_final": {
+      "gained_successes": 22,
+      "lost_successes": 8,
+      "exact_mcnemar_p": 0.016124801710247993,
+      "metrics": {
+        "found": {
+          "mean_difference": 0.14,
+          "paired_bootstrap_95_interval": [
+            0.04,
+            0.24
+          ]
+        },
+        "reward": {
+          "mean_difference": 19.85242624058072,
+          "paired_bootstrap_95_interval": [
+            5.004038572732576,
+            34.96350337818329
+          ]
+        },
+        "steps": {
+          "mean_difference": -203.78,
+          "paired_bootstrap_95_interval": [
+            -354.63125,
+            -54.219250000000066
+          ]
+        }
+      }
+    }
+  }
+}

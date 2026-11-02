@@ -1,0 +1,60 @@
+{
+  "training_config": {
+    "agent": "drone",
+    "requested_steps": 1000000,
+    "resume_from": "/home/rl/marl-waste-collection/models/ppo_drone/runs/border_penalty/best_model.zip",
+    "robot_model": "/home/rl/marl-waste-collection/models/ppo_go/final_model",
+    "drone_search": {
+      "speed": 1.0,
+      "min_search_speed": 0.3,
+      "boundary_penalty": 0.2,
+      "stagnation_penalty": 0.05
+    }
+  },
+  "models": {
+    "models/ppo_drone/runs/border_penalty/best_model.zip": {
+      "sha256": "c7d6c6e7eb50462310d5512367b32aad6d07bd363ba07fa47439addd9e345897",
+      "num_timesteps": 401408,
+      "learning_rate": 0.0003,
+      "n_envs": 1,
+      "n_steps": 2048,
+      "ent_coef": 0.0,
+      "gamma": 0.99
+    },
+    "models/ppo_drone/runs/border_penalty_+200/final_model.zip": {
+      "sha256": "afea49289e2a894337a9cbc226675d8aca88c8a35842e02b57ec898d279fa4fc",
+      "num_timesteps": 602112,
+      "learning_rate": 0.0001,
+      "n_envs": 1,
+      "n_steps": 2048,
+      "ent_coef": 0.0,
+      "gamma": 0.99
+    },
+    "models/ppo_drone/runs/run_005/best_model.zip": {
+      "sha256": "9528fdea74f443c2b0d66014296133a341d05958439857564850109c9364e74d",
+      "num_timesteps": 878592,
+      "learning_rate": 0.0001,
+      "n_envs": 1,
+      "n_steps": 2048,
+      "ent_coef": 0.0,
+      "gamma": 0.99
+    },
+    "models/ppo_drone/runs/run_005/final_model.zip": {
+      "sha256": "7d2a5bf2f52a2a26bc604bfb0b04d247ddf0b0b0e774df1147ed9c5986573794",
+      "num_timesteps": 1402880,
+      "learning_rate": 0.0001,
+      "n_envs": 1,
+      "n_steps": 2048,
+      "ent_coef": 0.0,
+      "gamma": 0.99
+    }
+  },
+  "environment_sha256": {
+    "agents.py": "c85b987e834d877ee6961efbdb2e810b1858828b2aa8f035f4f026c9f47ddab4",
+    "waste_collection_env.py": "1cadf6614cd9cf3ecdad4b3c0fa46f9aba6a01370884c86fc18618388bfd3636",
+    "raycast.py": "1fa7ee1b803e9565270c3e3b2361963d91a06c6f6bc625335863b65ecf130553",
+    "scene.xml": "e27f1dd675a568f829fcd27591bf1464e6a8db03cb46df31a23e8acaf4ba7422",
+    "/home/rl/Multiagents/masb3/masb3/base.py": "303b69a7136bd77ceaa5f53713fa331274f09c78f21deb12e0958f6f2d724d2d",
+    "/home/rl/Multiagents/masb3/masb3/utils.py": "df48ddf34600d035ab442a19f9011c191cd409bcf48c7f5510ba74eca68994a4"
+  }
+}

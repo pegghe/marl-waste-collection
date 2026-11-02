@@ -47,6 +47,7 @@ class WasteCollectionEnv(MujocoEnv):
     def reset(self, *, seed=None, options=None):
         obs, info = super().reset(seed=seed, options=options)
         info["drone_observation"] = self.get_drone_observation()
+        info["drone_visited_map"] = self.drone.visited_map.copy()
         return obs, info
 
     def render(self):
@@ -87,6 +88,9 @@ class WasteCollectionEnv(MujocoEnv):
             "drone_reward_components": self.drone.reward_components.copy(),
             "drone_found_target": bool(self.shared_comm[0]),
             "drone_observation": self.get_drone_observation(),
+            "drone_visited_map": self.drone.visited_map.copy(),
+            "drone_speed": self.drone.last_movement / self.dt,
+            "drone_blocked_fraction": self.drone.blocked_fraction,
         }
         terminated = bool(self.shared_comm[0]) if self.finish_on_discovery else success
         info["is_success"] = terminated

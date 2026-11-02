@@ -1,0 +1,1473 @@
+{
+  "method": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "torch_seed": "1000 + env seed per episode, reset for each model",
+    "end": "first drone detection or 2000 steps",
+    "obs_normalization": false,
+    "robot": "zero actions, robot is held still before discovery by the environment",
+    "blocked": "fraction of steps with any rejected movement, including partial clipping"
+  },
+  "models": {
+    "best_model/stochastic": {
+      "summary": {
+        "found": 12,
+        "episodes": 20,
+        "mean_reward": -51.24835646762286,
+        "mean_steps": 953.4,
+        "blocked_step_percent": 21.239773442416613,
+        "stationary_step_percent": 0.3408852527795259,
+        "mean_visited_cells": 24.45,
+        "mean_reward_components": {
+          "time": -47.639999999998494,
+          "exploration": 11.725,
+          "discovery": 10.472,
+          "boundary": -19.377100114460582,
+          "stagnation": -6.428256353162302
+        }
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 2000,
+          "found": false,
+          "return": -85.54357264820237,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.4994051048018704,
+          "visited_cells": 48,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 23.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -9.043572648204329
+          }
+        },
+        {
+          "seed": 1,
+          "steps": 2000,
+          "found": false,
+          "return": -79.14121977900083,
+          "blocked_steps": 59,
+          "stationary_steps": 0,
+          "mean_speed": 0.530925202728622,
+          "visited_cells": 68,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 33.5,
+            "discovery": 0.0,
+            "boundary": -3.5035570743181257,
+            "stagnation": -9.137662704684542
+          }
+        },
+        {
+          "seed": 2,
+          "steps": 163,
+          "found": true,
+          "return": 17.583241061525165,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.815834173018885,
+          "visited_cells": 16,
+          "reward_components": {
+            "time": -8.09999999999998,
+            "exploration": 7.5,
+            "discovery": 18.380000000000003,
+            "boundary": 0.0,
+            "stagnation": -0.19675893847483533
+          }
+        },
+        {
+          "seed": 3,
+          "steps": 2000,
+          "found": false,
+          "return": -121.9757055852715,
+          "blocked_steps": 438,
+          "stationary_steps": 0,
+          "mean_speed": 0.45174516384549124,
+          "visited_cells": 37,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 18.0,
+            "discovery": 0.0,
+            "boundary": -25.71104085574138,
+            "stagnation": -14.264664729531773
+          }
+        },
+        {
+          "seed": 4,
+          "steps": 2000,
+          "found": false,
+          "return": -296.9590598197857,
+          "blocked_steps": 1671,
+          "stationary_steps": 65,
+          "mean_speed": 0.310333165064824,
+          "visited_cells": 18,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 8.5,
+            "discovery": 0.0,
+            "boundary": -174.28788758211695,
+            "stagnation": -31.17117223766343
+          }
+        },
+        {
+          "seed": 5,
+          "steps": 51,
+          "found": true,
+          "return": 18.39836668211191,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.6826750705826535,
+          "visited_cells": 4,
+          "reward_components": {
+            "time": -2.499999999999999,
+            "exploration": 1.5,
+            "discovery": 19.5,
+            "boundary": 0.0,
+            "stagnation": -0.10163331788808849
+          }
+        },
+        {
+          "seed": 6,
+          "steps": 2000,
+          "found": false,
+          "return": -93.01668017976522,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.4760589766713263,
+          "visited_cells": 35,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 17.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -10.016680179767363
+          }
+        },
+        {
+          "seed": 7,
+          "steps": 957,
+          "found": true,
+          "return": -121.40864545691662,
+          "blocked_steps": 700,
+          "stationary_steps": 0,
+          "mean_speed": 0.3697427631923841,
+          "visited_cells": 15,
+          "reward_components": {
+            "time": -47.79999999999942,
+            "exploration": 7.0,
+            "discovery": 10.440000000000001,
+            "boundary": -79.39961613071154,
+            "stagnation": -11.649029326204195
+          }
+        },
+        {
+          "seed": 8,
+          "steps": 367,
+          "found": true,
+          "return": 6.381141900798577,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.5763630370697805,
+          "visited_cells": 20,
+          "reward_components": {
+            "time": -18.300000000000125,
+            "exploration": 9.5,
+            "discovery": 16.34,
+            "boundary": 0.0,
+            "stagnation": -1.1588580992014175
+          }
+        },
+        {
+          "seed": 9,
+          "steps": 6,
+          "found": true,
+          "return": 20.700000000000003,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.8713689591693384,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -0.25,
+            "exploration": 1.0,
+            "discovery": 19.950000000000003,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 10,
+          "steps": 10,
+          "found": true,
+          "return": 19.96,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9080071461942889,
+          "visited_cells": 2,
+          "reward_components": {
+            "time": -0.44999999999999996,
+            "exploration": 0.5,
+            "discovery": 19.91,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 11,
+          "steps": 2000,
+          "found": false,
+          "return": -194.7493534741414,
+          "blocked_steps": 920,
+          "stationary_steps": 0,
+          "mean_speed": 0.41235941174259844,
+          "visited_cells": 26,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 12.5,
+            "discovery": 0.0,
+            "boundary": -88.89330727116389,
+            "stagnation": -18.356046202972497
+          }
+        },
+        {
+          "seed": 12,
+          "steps": 27,
+          "found": true,
+          "return": 20.439999999999998,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 1.012127276263188,
+          "visited_cells": 5,
+          "reward_components": {
+            "time": -1.3000000000000005,
+            "exploration": 2.0,
+            "discovery": 19.74,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 13,
+          "steps": 2000,
+          "found": false,
+          "return": -74.60097191151863,
+          "blocked_steps": 4,
+          "stationary_steps": 0,
+          "mean_speed": 0.529020069405297,
+          "visited_cells": 68,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 33.5,
+            "discovery": 0.0,
+            "boundary": -0.29843561701527577,
+            "stagnation": -7.8025362945052255
+          }
+        },
+        {
+          "seed": 14,
+          "steps": 2000,
+          "found": false,
+          "return": -105.28889736306282,
+          "blocked_steps": 245,
+          "stationary_steps": 0,
+          "mean_speed": 0.4766053814665305,
+          "visited_cells": 42,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 20.5,
+            "discovery": 0.0,
+            "boundary": -14.652391735005327,
+            "stagnation": -11.136505628059474
+          }
+        },
+        {
+          "seed": 15,
+          "steps": 8,
+          "found": true,
+          "return": 20.07957680810245,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9767319872904389,
+          "visited_cells": 2,
+          "reward_components": {
+            "time": -0.35,
+            "exploration": 0.5,
+            "discovery": 19.93,
+            "boundary": 0.0,
+            "stagnation": -0.00042319189754990165
+          }
+        },
+        {
+          "seed": 16,
+          "steps": 43,
+          "found": true,
+          "return": 19.979999999999997,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9697008961904787,
+          "visited_cells": 6,
+          "reward_components": {
+            "time": -2.1000000000000005,
+            "exploration": 2.5,
+            "discovery": 19.58,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 17,
+          "steps": 15,
+          "found": true,
+          "return": 20.16,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9646161410488487,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -0.7000000000000001,
+            "exploration": 1.0,
+            "discovery": 19.86,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 18,
+          "steps": 1278,
+          "found": true,
+          "return": -33.805893168680456,
+          "blocked_steps": 13,
+          "stationary_steps": 0,
+          "mean_speed": 0.5635899209415068,
+          "visited_cells": 57,
+          "reward_components": {
+            "time": -63.84999999999851,
+            "exploration": 28.0,
+            "discovery": 7.23,
+            "boundary": -0.795766023139123,
+            "stagnation": -4.3901271455415145
+          }
+        },
+        {
+          "seed": 19,
+          "steps": 143,
+          "found": true,
+          "return": 17.840543581350182,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.7809286978825274,
+          "visited_cells": 14,
+          "reward_components": {
+            "time": -7.099999999999983,
+            "exploration": 6.5,
+            "discovery": 18.580000000000002,
+            "boundary": 0.0,
+            "stagnation": -0.13945641864981903
+          }
+        }
+      ]
+    },
+    "best_model/deterministic": {
+      "summary": {
+        "found": 13,
+        "episodes": 20,
+        "mean_reward": -70.47877875108463,
+        "mean_steps": 947.5,
+        "blocked_step_percent": 27.87335092348285,
+        "stationary_step_percent": 0.0,
+        "mean_visited_cells": 23.75,
+        "mean_reward_components": {
+          "time": -47.3424999999985,
+          "exploration": 11.375,
+          "discovery": 10.531500000000001,
+          "boundary": -21.02326781380047,
+          "stagnation": -24.01951093728388
+        }
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 235,
+          "found": true,
+          "return": 18.46,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.7783015960065196,
+          "visited_cells": 26,
+          "reward_components": {
+            "time": -11.700000000000031,
+            "exploration": 12.5,
+            "discovery": 17.66,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 1,
+          "steps": 2000,
+          "found": false,
+          "return": -117.67477580189488,
+          "blocked_steps": 867,
+          "stationary_steps": 0,
+          "mean_speed": 0.33843100686503014,
+          "visited_cells": 75,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 37.0,
+            "discovery": 0.0,
+            "boundary": -23.137247014041932,
+            "stagnation": -31.537528787853407
+          }
+        },
+        {
+          "seed": 2,
+          "steps": 128,
+          "found": true,
+          "return": 19.88,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.8386372672253887,
+          "visited_cells": 16,
+          "reward_components": {
+            "time": -6.349999999999985,
+            "exploration": 7.5,
+            "discovery": 18.73,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 3,
+          "steps": 1734,
+          "found": true,
+          "return": -123.38590270415003,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.1562908349095053,
+          "visited_cells": 26,
+          "reward_components": {
+            "time": -86.64999999999722,
+            "exploration": 12.5,
+            "discovery": 2.669999999999999,
+            "boundary": 0.0,
+            "stagnation": -51.90590270415016
+          }
+        },
+        {
+          "seed": 4,
+          "steps": 316,
+          "found": true,
+          "return": 8.859079501583626,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.5577684266246982,
+          "visited_cells": 20,
+          "reward_components": {
+            "time": -15.750000000000089,
+            "exploration": 9.5,
+            "discovery": 16.85,
+            "boundary": 0.0,
+            "stagnation": -1.740920498416376
+          }
+        },
+        {
+          "seed": 5,
+          "steps": 46,
+          "found": true,
+          "return": 18.8,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.6451309980847708,
+          "visited_cells": 4,
+          "reward_components": {
+            "time": -2.25,
+            "exploration": 1.5,
+            "discovery": 19.55,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 6,
+          "steps": 940,
+          "found": true,
+          "return": -50.60098389578564,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.18767946109006559,
+          "visited_cells": 19,
+          "reward_components": {
+            "time": -46.94999999999947,
+            "exploration": 9.0,
+            "discovery": 10.61,
+            "boundary": 0.0,
+            "stagnation": -23.260983895785785
+          }
+        },
+        {
+          "seed": 7,
+          "steps": 2000,
+          "found": false,
+          "return": -406.0703621087445,
+          "blocked_steps": 1963,
+          "stationary_steps": 0,
+          "mean_speed": 0.008649325956086532,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 1.0,
+            "discovery": 0.0,
+            "boundary": -209.39482609231422,
+            "stagnation": -97.67553601642706
+          }
+        },
+        {
+          "seed": 8,
+          "steps": 2000,
+          "found": false,
+          "return": -120.69852783597202,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2141629156055804,
+          "visited_cells": 44,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 21.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -42.19852783597183
+          }
+        },
+        {
+          "seed": 9,
+          "steps": 5,
+          "found": true,
+          "return": 20.76,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 1.0400922956147738,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -0.2,
+            "exploration": 1.0,
+            "discovery": 19.96,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 10,
+          "steps": 10,
+          "found": true,
+          "return": 20.46,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9176973123316701,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -0.44999999999999996,
+            "exploration": 1.0,
+            "discovery": 19.91,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 11,
+          "steps": 2000,
+          "found": false,
+          "return": -157.0378505296661,
+          "blocked_steps": 786,
+          "stationary_steps": 0,
+          "mean_speed": 0.24630560822057987,
+          "visited_cells": 57,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 28.0,
+            "discovery": 0.0,
+            "boundary": -44.564869234123165,
+            "stagnation": -40.4729812955435
+          }
+        },
+        {
+          "seed": 12,
+          "steps": 26,
+          "found": true,
+          "return": 20.5,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 1.054302903808293,
+          "visited_cells": 5,
+          "reward_components": {
+            "time": -1.2500000000000004,
+            "exploration": 2.0,
+            "discovery": 19.75,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 13,
+          "steps": 2000,
+          "found": false,
+          "return": -301.78874689390204,
+          "blocked_steps": 1666,
+          "stationary_steps": 0,
+          "mean_speed": 0.1417459436486148,
+          "visited_cells": 33,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 16.0,
+            "discovery": 0.0,
+            "boundary": -143.36841393553004,
+            "stagnation": -74.42033295836784
+          }
+        },
+        {
+          "seed": 14,
+          "steps": 2000,
+          "found": false,
+          "return": -152.21883420269506,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.148863069081917,
+          "visited_cells": 30,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 14.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -66.71883420269471
+          }
+        },
+        {
+          "seed": 15,
+          "steps": 5,
+          "found": true,
+          "return": 19.76,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9779594407271059,
+          "visited_cells": 1,
+          "reward_components": {
+            "time": -0.2,
+            "exploration": 0.0,
+            "discovery": 19.96,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 16,
+          "steps": 42,
+          "found": true,
+          "return": 20.04,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9832822408839819,
+          "visited_cells": 6,
+          "reward_components": {
+            "time": -2.0500000000000007,
+            "exploration": 2.5,
+            "discovery": 19.59,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 17,
+          "steps": 14,
+          "found": true,
+          "return": 20.220000000000002,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.9875941874885056,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -0.65,
+            "exploration": 1.0,
+            "discovery": 19.87,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 18,
+          "steps": 1449,
+          "found": true,
+          "return": -45.329018634678356,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.3870143446668351,
+          "visited_cells": 60,
+          "reward_components": {
+            "time": -72.39999999999803,
+            "exploration": 29.5,
+            "discovery": 5.5200000000000005,
+            "boundary": 0.0,
+            "stagnation": -7.949018634679165
+          }
+        },
+        {
+          "seed": 19,
+          "steps": 2000,
+          "found": false,
+          "return": -122.50965191578786,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.23121470101126818,
+          "visited_cells": 41,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 20.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -42.50965191578772
+          }
+        }
+      ]
+    },
+    "final_model/stochastic": {
+      "summary": {
+        "found": 9,
+        "episodes": 20,
+        "mean_reward": -72.45474537730037,
+        "mean_steps": 1327.5,
+        "blocked_step_percent": 5.52165725047081,
+        "stationary_step_percent": 0.0,
+        "mean_visited_cells": 23.55,
+        "mean_reward_components": {
+          "time": -66.35249999999783,
+          "exploration": 11.275,
+          "discovery": 6.729500000000002,
+          "boundary": -4.632643592600601,
+          "stagnation": -19.47410178470016
+        }
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 2000,
+          "found": false,
+          "return": -108.2257084037215,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2577842964635771,
+          "visited_cells": 37,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 18.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -26.225708403722944
+          }
+        },
+        {
+          "seed": 1,
+          "steps": 2000,
+          "found": false,
+          "return": -112.93360736736079,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2626434932531307,
+          "visited_cells": 30,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 14.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -27.433607367361457
+          }
+        },
+        {
+          "seed": 2,
+          "steps": 528,
+          "found": true,
+          "return": -7.927872438074127,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.31337856990216,
+          "visited_cells": 18,
+          "reward_components": {
+            "time": -26.35000000000024,
+            "exploration": 8.5,
+            "discovery": 14.729999999999999,
+            "boundary": 0.0,
+            "stagnation": -4.807872438074043
+          }
+        },
+        {
+          "seed": 3,
+          "steps": 2000,
+          "found": false,
+          "return": -119.87708423999304,
+          "blocked_steps": 11,
+          "stationary_steps": 0,
+          "mean_speed": 0.24641968197145736,
+          "visited_cells": 23,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 11.0,
+            "discovery": 0.0,
+            "boundary": -0.3264037233539483,
+            "stagnation": -30.550680516639748
+          }
+        },
+        {
+          "seed": 4,
+          "steps": 1844,
+          "found": true,
+          "return": -109.37628316753887,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.24149945421713934,
+          "visited_cells": 21,
+          "reward_components": {
+            "time": -92.14999999999691,
+            "exploration": 10.0,
+            "discovery": 1.5700000000000003,
+            "boundary": 0.0,
+            "stagnation": -28.796283167539567
+          }
+        },
+        {
+          "seed": 5,
+          "steps": 2000,
+          "found": false,
+          "return": -119.24230818001467,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2446300991224925,
+          "visited_cells": 21,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 10.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -29.242308180015616
+          }
+        },
+        {
+          "seed": 6,
+          "steps": 2000,
+          "found": false,
+          "return": -112.61747571564277,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2495766667838576,
+          "visited_cells": 35,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 17.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -29.617475715643668
+          }
+        },
+        {
+          "seed": 7,
+          "steps": 2000,
+          "found": false,
+          "return": -107.41578048685587,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2550585107173424,
+          "visited_cells": 40,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 19.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -26.915780486856665
+          }
+        },
+        {
+          "seed": 8,
+          "steps": 1324,
+          "found": true,
+          "return": -69.92313235698556,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.24782134596829417,
+          "visited_cells": 19,
+          "reward_components": {
+            "time": -66.14999999999839,
+            "exploration": 9.0,
+            "discovery": 6.7700000000000005,
+            "boundary": 0.0,
+            "stagnation": -19.543132356985826
+          }
+        },
+        {
+          "seed": 9,
+          "steps": 2000,
+          "found": false,
+          "return": -106.77081345865815,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2634310525533923,
+          "visited_cells": 41,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 20.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -26.77081345865874
+          }
+        },
+        {
+          "seed": 10,
+          "steps": 24,
+          "found": true,
+          "return": 19.62,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.6345570238095722,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -1.1500000000000004,
+            "exploration": 1.0,
+            "discovery": 19.77,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 11,
+          "steps": 2000,
+          "found": false,
+          "return": -116.49764444592599,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.24127410180378656,
+          "visited_cells": 28,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 13.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -29.997644445926564
+          }
+        },
+        {
+          "seed": 12,
+          "steps": 406,
+          "found": true,
+          "return": -2.362760667277758,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.3359502621751297,
+          "visited_cells": 14,
+          "reward_components": {
+            "time": -20.250000000000153,
+            "exploration": 6.5,
+            "discovery": 15.95,
+            "boundary": 0.0,
+            "stagnation": -4.562760667277731
+          }
+        },
+        {
+          "seed": 13,
+          "steps": 2000,
+          "found": false,
+          "return": -113.62941908838195,
+          "blocked_steps": 151,
+          "stationary_steps": 0,
+          "mean_speed": 0.2544199987618296,
+          "visited_cells": 40,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 19.5,
+            "discovery": 0.0,
+            "boundary": -4.813899483700894,
+            "stagnation": -28.315519604682446
+          }
+        },
+        {
+          "seed": 14,
+          "steps": 122,
+          "found": true,
+          "return": 15.696375690842633,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.4197791119929846,
+          "visited_cells": 8,
+          "reward_components": {
+            "time": -6.0499999999999865,
+            "exploration": 3.5,
+            "discovery": 18.79,
+            "boundary": 0.0,
+            "stagnation": -0.5436243091573674
+          }
+        },
+        {
+          "seed": 15,
+          "steps": 2000,
+          "found": false,
+          "return": -213.45800222160497,
+          "blocked_steps": 1304,
+          "stationary_steps": 0,
+          "mean_speed": 0.2231479410771546,
+          "visited_cells": 39,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 19.0,
+            "discovery": 0.0,
+            "boundary": -87.51256864495718,
+            "stagnation": -44.94543357664563
+          }
+        },
+        {
+          "seed": 16,
+          "steps": 52,
+          "found": true,
+          "return": 19.44,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.6498351527289592,
+          "visited_cells": 6,
+          "reward_components": {
+            "time": -2.549999999999999,
+            "exploration": 2.5,
+            "discovery": 19.490000000000002,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 17,
+          "steps": 28,
+          "found": true,
+          "return": 19.88,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.5305166483839058,
+          "visited_cells": 4,
+          "reward_components": {
+            "time": -1.3500000000000005,
+            "exploration": 1.5,
+            "discovery": 19.73,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 18,
+          "steps": 2000,
+          "found": false,
+          "return": -116.43854775918494,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.23929139324810053,
+          "visited_cells": 30,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 14.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -30.93854775918597
+          }
+        },
+        {
+          "seed": 19,
+          "steps": 222,
+          "found": true,
+          "return": 12.96515676037074,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.5191008875801311,
+          "visited_cells": 14,
+          "reward_components": {
+            "time": -11.050000000000022,
+            "exploration": 6.5,
+            "discovery": 17.79,
+            "boundary": 0.0,
+            "stagnation": -0.2748432396292812
+          }
+        }
+      ]
+    },
+    "final_model/deterministic": {
+      "summary": {
+        "found": 7,
+        "episodes": 20,
+        "mean_reward": -109.36271134110984,
+        "mean_steps": 1483.05,
+        "blocked_step_percent": 14.406122517784295,
+        "stationary_step_percent": 1.0923434813391322,
+        "mean_visited_cells": 23.5,
+        "mean_reward_components": {
+          "time": -74.13499999999749,
+          "exploration": 11.25,
+          "discovery": 5.173,
+          "boundary": -7.535330096136173,
+          "stagnation": -44.115381244973584
+        }
+      },
+      "episodes": [
+        {
+          "seed": 0,
+          "steps": 2000,
+          "found": false,
+          "return": -160.8691623650543,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.09260000503742413,
+          "visited_cells": 19,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 9.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -69.86916236505434
+          }
+        },
+        {
+          "seed": 1,
+          "steps": 2000,
+          "found": false,
+          "return": -121.6561801605618,
+          "blocked_steps": 181,
+          "stationary_steps": 0,
+          "mean_speed": 0.1984509344744,
+          "visited_cells": 48,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 23.5,
+            "discovery": 0.0,
+            "boundary": -1.8502537298262123,
+            "stagnation": -43.30592643073599
+          }
+        },
+        {
+          "seed": 2,
+          "steps": 2000,
+          "found": false,
+          "return": -141.39209213583464,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.13459198018608523,
+          "visited_cells": 31,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 15.0,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -56.39209213583439
+          }
+        },
+        {
+          "seed": 3,
+          "steps": 2000,
+          "found": false,
+          "return": -159.8220560322103,
+          "blocked_steps": 158,
+          "stationary_steps": 0,
+          "mean_speed": 0.10413948720444746,
+          "visited_cells": 22,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 10.5,
+            "discovery": 0.0,
+            "boundary": -0.4966890641890558,
+            "stagnation": -69.82536696802148
+          }
+        },
+        {
+          "seed": 4,
+          "steps": 2000,
+          "found": false,
+          "return": -189.26035817416667,
+          "blocked_steps": 1221,
+          "stationary_steps": 0,
+          "mean_speed": 0.06563857851304025,
+          "visited_cells": 15,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 7.0,
+            "discovery": 0.0,
+            "boundary": -13.076763048989871,
+            "stagnation": -83.18359512517553
+          }
+        },
+        {
+          "seed": 5,
+          "steps": 2000,
+          "found": false,
+          "return": -150.7555322934406,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.12909272684071968,
+          "visited_cells": 16,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 7.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -58.25553229344091
+          }
+        },
+        {
+          "seed": 6,
+          "steps": 2000,
+          "found": false,
+          "return": -168.1586536416455,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.0781192056792842,
+          "visited_cells": 18,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 8.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -76.65865364164553
+          }
+        },
+        {
+          "seed": 7,
+          "steps": 2000,
+          "found": false,
+          "return": -151.66837601816053,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.10944129045090348,
+          "visited_cells": 26,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 12.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -64.16837601816017
+          }
+        },
+        {
+          "seed": 8,
+          "steps": 1689,
+          "found": true,
+          "return": -94.48157832845196,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.19639074033510487,
+          "visited_cells": 41,
+          "reward_components": {
+            "time": -84.39999999999735,
+            "exploration": 20.0,
+            "discovery": 3.1200000000000006,
+            "boundary": 0.0,
+            "stagnation": -33.20157832845228
+          }
+        },
+        {
+          "seed": 9,
+          "steps": 2000,
+          "found": false,
+          "return": -128.8676765327726,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.17337274783545203,
+          "visited_cells": 38,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 18.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -47.36767653277248
+          }
+        },
+        {
+          "seed": 10,
+          "steps": 25,
+          "found": true,
+          "return": 19.56,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.5899227489935595,
+          "visited_cells": 3,
+          "reward_components": {
+            "time": -1.2000000000000004,
+            "exploration": 1.0,
+            "discovery": 19.759999999999998,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 11,
+          "steps": 2000,
+          "found": false,
+          "return": -136.4260757541594,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.1478796267553172,
+          "visited_cells": 32,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 15.5,
+            "discovery": 0.0,
+            "boundary": 0.0,
+            "stagnation": -51.926075754159164
+          }
+        },
+        {
+          "seed": 12,
+          "steps": 452,
+          "found": true,
+          "return": -9.340732297755814,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.2399456087489232,
+          "visited_cells": 16,
+          "reward_components": {
+            "time": -22.550000000000185,
+            "exploration": 7.5,
+            "discovery": 15.489999999999998,
+            "boundary": 0.0,
+            "stagnation": -9.780732297755812
+          }
+        },
+        {
+          "seed": 13,
+          "steps": 2000,
+          "found": false,
+          "return": -130.69959330414355,
+          "blocked_steps": 101,
+          "stationary_steps": 0,
+          "mean_speed": 0.15403805518651317,
+          "visited_cells": 41,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 20.0,
+            "discovery": 0.0,
+            "boundary": -0.524929068868019,
+            "stagnation": -50.174664235275316
+          }
+        },
+        {
+          "seed": 14,
+          "steps": 131,
+          "found": true,
+          "return": 15.349253861564495,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.36708887921158573,
+          "visited_cells": 8,
+          "reward_components": {
+            "time": -6.499999999999985,
+            "exploration": 3.5,
+            "discovery": 18.700000000000003,
+            "boundary": 0.0,
+            "stagnation": -0.3507461384355055
+          }
+        },
+        {
+          "seed": 15,
+          "steps": 2000,
+          "found": false,
+          "return": -216.44532347763575,
+          "blocked_steps": 1250,
+          "stationary_steps": 324,
+          "mean_speed": 0.15360457160574978,
+          "visited_cells": 37,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 18.0,
+            "discovery": 0.0,
+            "boundary": -73.37144010787844,
+            "stagnation": -61.07388336975755
+          }
+        },
+        {
+          "seed": 16,
+          "steps": 48,
+          "found": true,
+          "return": 19.18,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.6477139382852318,
+          "visited_cells": 5,
+          "reward_components": {
+            "time": -2.3499999999999996,
+            "exploration": 2.0,
+            "discovery": 19.53,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 17,
+          "steps": 30,
+          "found": true,
+          "return": 19.76,
+          "blocked_steps": 0,
+          "stationary_steps": 0,
+          "mean_speed": 0.5029147449500896,
+          "visited_cells": 4,
+          "reward_components": {
+            "time": -1.4500000000000006,
+            "exploration": 1.5,
+            "discovery": 19.71,
+            "boundary": 0.0,
+            "stagnation": 0.0
+          }
+        },
+        {
+          "seed": 18,
+          "steps": 2000,
+          "found": false,
+          "return": -153.6028257090315,
+          "blocked_steps": 474,
+          "stationary_steps": 0,
+          "mean_speed": 0.10733422458484611,
+          "visited_cells": 28,
+          "reward_components": {
+            "time": -99.99999999999646,
+            "exploration": 13.5,
+            "discovery": 0.0,
+            "boundary": -1.14630181745585,
+            "stagnation": -65.95652389157505
+          }
+        },
+        {
+          "seed": 19,
+          "steps": 1286,
+          "found": true,
+          "return": -147.65726445873648,
+          "blocked_steps": 888,
+          "stationary_steps": 0,
+          "mean_speed": 0.1513131727460827,
+          "visited_cells": 22,
+          "reward_components": {
+            "time": -64.2499999999985,
+            "exploration": 10.5,
+            "discovery": 7.15,
+            "boundary": -60.24022508551599,
+            "stagnation": -40.81703937322028
+          }
+        }
+      ]
+    }
+  }
+}

@@ -47,9 +47,11 @@ For evaluation without a window: `python robot_experiment.py evaluate --episodes
 MASB3 comes from `Multiagents/masb3`. The environments in
 `Multiagents/masb3-experiments` serve as examples; they are not required here.
 PPO collects 2,048 steps per rollout with this single learning agent.
-Observations, rewards, and the 800-step episode limit are unchanged.
-Existing SB3 PPO checkpoints remain compatible because observations and actions
-are unchanged. MASB3 also writes training checkpoints under `checkpoints/`.
+Robot observations and rewards retain their existing format. Episodes last at
+most 2,000 steps.
+Existing robot SB3 PPO checkpoints remain compatible because robot observations
+and actions are unchanged. Drone checkpoints need the exploration-map observation
+format described below. MASB3 also writes training checkpoints under `checkpoints/`.
 
 ## Observation and actions
 
@@ -67,7 +69,7 @@ Existing checkpoints were trained with the previous reward. Run `python robot_ex
 to train a new policy with this reward.
 
 Success means `go=1` and distance to the target ≤ 0.25 m.
-An episode lasts at most 800 steps, including waiting. Each step simulates 0.05 s.
+An episode lasts at most 2,000 steps, including waiting. Each step simulates 0.05 s.
 Waiting is learned, so small movements can remain before the go signal.
 
 ## Drone search reward
@@ -78,17 +80,47 @@ entering a new 0.5 m grid cell earns +0.5 once per episode. The initial cell is
 already visited at reset. Detection requires a ray to hit a bottle geometry.
 The first detection earns `20 * max(0, 1 - (steps - 1) / max_steps)`;
 there is no time penalty on that step. All drone rewards stop after discovery.
+During search, commands clipped by the movement limits also receive a
+`boundary` cost, proportional to the rejected displacement and capped at -0.2.
+Moving inward or along a boundary has no boundary cost. Actual speeds below
+0.3 m/s receive a linear `stagnation` cost: -0.05 when stationary, falling to
+zero at 0.3 m/s. These costs are additional to the -0.05 time cost and are zero
+on discovery and afterwards. A fully blocked outward command costs -0.3 per
+step; staying still costs -0.1. The maximum speed remains 1 m/s per axis.
+Step info exposes `drone_speed` in m/s and `drone_blocked_fraction` in [0, 1].
 In drone mode, discovery ends the episode; robot success does not end it.
 The robot's training reward remains unchanged.
 
 Drone observations are available through `get_drone_observation()` and
-`info["drone_observation"]` on reset and step. The 23-element float32 vector is:
+`info["drone_observation"]` on reset and step. The 219-element float32 vector is:
 shared communication [0:3] = [found, bottle_x / 5, bottle_y / 5], drone XY / 5
-[3:5], then nine ray pairs [5:] = [normalized distance, is_bottle].
+[3:5], nine ray pairs [5:23] = [normalized distance, is_bottle], then the
+flattened exploration map [23:].
 Communication is zero until first detection, then stores the bottle position
 for the episode. Missing rays have normalized distance 1.
-Visited cells are tracked only for reward calculation. Robot observations
-remain unchanged.
+
+The map is a 14 × 14 grid covering [-3.5, 3.5] m on both axes, with 0.5 m cells.
+Each entry is 0 for an unvisited cell and 1 for a cell the drone has entered.
+Rows follow increasing world Y and columns follow increasing world X, starting
+at -3.5 m. The positive boundary belongs to the last row or column. Recover the
+grid with `observation[23:].reshape(14, 14)`. The drone's current position stays
+in [3:5]. The grid records visited positions, not the whole area seen by the rays;
+it never reveals an undetected bottle. Rays still determine bottle detection.
+
+At reset only the starting cell is visited. Every step updates the map before
+returning the next observation, and the exploration bonus uses the same map to
+reward each cell once. `info["drone_visited_map"]` provides a separate 2D copy on
+reset and step for inspection. Robot observations remain unchanged.
+
+Drone policies trained with 23 observations cannot use the new 219-element
+input. Start a fresh drone training without `--resume`:
+
+```bash
+python robot_experiment.py train --agent drone --steps 600000
+```
+
+Previous runs are preserved. Resume or evaluate only drone models trained with
+the exploration map. The saved robot policy can still be used as before.
 
 ## Train only the drone
 
@@ -102,7 +134,14 @@ without learning. Only the drone is trained, and its policy is saved separately
 at `models/ppo_drone/runs/<run-id>/final_model.zip`. Drone actions command X/Y velocity up to
 1 m/s per axis, with fixed altitude 3 m and positions limited to [-3.5, 3.5] m.
 Drone spawn is randomized in [-3, 3] m on reset. A drone episode ends on bottle
-detection or after 800 steps. Use `--agent robot` for the original robot task.
+detection or after 2,000 steps. Use `--agent robot` for the original robot task.
+
+Reward changes affect learning, so a saved policy needs further training to
+learn to avoid blocked commands. Map-based checkpoints retain their 219-element
+observation format and can be resumed. Every new run records the speed and
+search penalty parameters under `drone_search` in `config.json`; older
+checkpoints are preserved. Use `--model` to choose the new run explicitly when
+evaluating.
 
 ## TensorBoard and success rate
 
@@ -189,7 +228,7 @@ shows search followed by navigation:
 python robot_experiment.py evaluate --agent drone --render --model models/ppo_drone/runs/run_001
 ```
 
-Existing checkpoint shapes remain compatible. The robot now receives hidden
+Robot checkpoint shapes remain compatible. The robot now receives hidden
 target coordinates while waiting, unlike its earlier training observations;
 its waiting behavior under this input should be evaluated.
 
