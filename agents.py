@@ -10,34 +10,93 @@ from raycast import Raycaster
 class RobotAgent:
     """Robot observations, waiting behavior, and navigation reward."""
 
-    def __init__(self, env):
+    ray_categories = ("plastic", "paper", "obstacle", "robot", "none")
+
+    def __init__(self, env, name="robot"):
         self.env = env
-        self.visual_body_id = env.model.body("robot_visual").id
+        self.name = name
+        prefix = "" if name == "robot" else f"{name}_"
+        self.body_id = env.model.body(name).id
+        self.visual_body_id = env.model.body(prefix + "robot_visual").id
+        self.sensor_id = env.model.body(prefix + "robot_head_sensor").id
+        joints = [env.model.joint(prefix + axis).id for axis in ("x", "y")]
+        self.qpos_indices = env.model.jnt_qposadr[joints].copy()
+        self.qvel_indices = env.model.jnt_dofadr[joints].copy()
+        self.actuator_ids = np.array([
+            env.model.actuator(prefix + "move_" + axis).id for axis in ("x", "y")
+        ])
         self.max_turn_speed = np.deg2rad(120.0)
         self.turn_response_time = 0.3
         self.success_radius = 0.25
         self.observation_space = env.observation_space
-        self.action_space = env.action_space
+        self.action_space = spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
+        self.ray_length = 2.0
+        self.ray_count = 9
+        # Ignore this robot (group 1 or 2) and the floor (group 3).
+        geomgroup = np.ones(6, dtype=np.uint8)
+        geomgroup[1 if name == "robot" else 2] = 0
+        geomgroup[3] = 0
+        self.raycaster = Raycaster(
+            env.model, env.data, {self.body_id: self.sensor_id}, geomgroup=geomgroup,
+        )
+        # Three horizontal angles at each elevation: see robot bodies as well
+        # as low waste objects, which a single horizontal fan would miss.
+        directions = np.array([
+            [np.cos(pitch) * np.cos(yaw), np.cos(pitch) * np.sin(yaw), -np.sin(pitch)]
+            for pitch in np.deg2rad([0, 15, 30])
+            for yaw in np.deg2rad([-60, 0, 60])
+        ])
+        self.raycaster.setup_raycast(self.body_id, self.ray_count, 120,
+                                    local_directions=directions)
+        self.ray_distances = np.full(self.ray_count, -1.0)
+        self.ray_geomids = np.full(self.ray_count, -1, dtype=np.int32)
+        self.ray_types = np.full(self.ray_count, 4, dtype=np.int32)
 
-    def reset(self):
+    @property
+    def position(self):
+        return self.env.data.qpos[self.qpos_indices]
+
+    @property
+    def velocity(self):
+        return self.env.data.qvel[self.qvel_indices]
+
+    def reset(self, qpos=None):
         env = self.env
         env.model.body_quat[self.visual_body_id] = [1, 0, 0, 0]
         self.go_delay = env.np_random.integers(0, 101)
         self.go = 0 if env.drone_training else int(self.go_delay == 0)
-        qpos = env.init_qpos.copy()
-        qpos[:2] = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
-        self.start_position = qpos[:2].copy()
-        env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
-        while np.linalg.norm(env.target - qpos[:2]) < 0.75:
+        self.completed = False
+        self.specialization = int(env.np_random.integers(2)) if env.sorting else 0
+        self.detected_type = -1
+        if qpos is None:
+            qpos = env.init_qpos.copy()
+        position = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
+        if self.name == "robot":
             env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
+            while np.linalg.norm(env.target - position) < env.min_spawn_distance:
+                env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
+        else:
+            # Keep the second shell clear of the first robot and the bottle.
+            while (np.linalg.norm(position - qpos[env.robot.qpos_indices]) < 1.0
+                   or np.linalg.norm(position - env.target) < env.min_spawn_distance):
+                position = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
+        qpos[self.qpos_indices] = position
+        self.start_position = position.copy()
         return qpos
 
-    def apply_action(self, action):
+    def control(self, action):
         # As in the thesis, ground-agent actions stay zero until detection.
         if self.env.drone_training and not self.env.shared_comm[0]:
-            action = np.zeros(self.action_space.shape, dtype=self.action_space.dtype)
-        self.env.do_simulation(np.clip(action, -1, 1), self.env.frame_skip)
-        self.face_target()
+            return np.zeros(2)
+        if self.completed:
+            return np.zeros(2)
+        return np.clip(action, -1, 1)
+
+    def apply_action(self, action):
+        """Advance one shared step, leaving other robot controls at zero."""
+        controls = np.zeros(self.env.model.nu)
+        controls[self.actuator_ids] = action
+        self.env.advance_robots(controls)
 
     def face_target(self):
         env = self.env
@@ -49,7 +108,7 @@ class RobotAgent:
             if not self.go:
                 return
             target = env.target
-        direction = target - env.data.qpos[:2]
+        direction = target - self.position
         if np.linalg.norm(direction) < 1e-8:
             return
         quat = env.model.body_quat[self.visual_body_id]
@@ -71,34 +130,79 @@ class RobotAgent:
         if self.env.drone_training:
             self.go = int(bool(self.env.shared_comm[0]))
             relative_target = (
-                self.env.shared_comm[1:] * self.env.drone.area_half_size - self.env.data.qpos[:2]
+                self.env.shared_comm[1:] * self.env.drone.area_half_size - self.position
                 if self.go else np.zeros(2)
             )
         else:
-            relative_target = self.env.target - self.env.data.qpos[:2]
-        return np.concatenate((
-            self.env.data.qpos[:2],
-            self.env.data.qvel[:2],
+            relative_target = self.env.target - self.position
+        navigation = np.concatenate((
+            self.position,
+            self.velocity,
             relative_target,
             [self.go],
         ))
+        if not self.env.sorting:
+            return navigation
+        return np.concatenate((
+            navigation,
+            [self.specialization == 0, self.specialization == 1],
+            [self.detected_type == 0, self.detected_type == 1],
+            self.get_ray_observation().ravel(),
+        )).astype(np.float32)
 
     def compute_reward(self):
-        distance = float(np.linalg.norm(self.env.target - self.env.data.qpos[:2]))
+        distance = float(np.linalg.norm(self.env.target - self.position))
+        if self.completed:
+            return 0.0, True, distance
         success = bool(self.go and distance <= self.success_radius)
         reward = -0.01  # Step penalty.
         if self.go:
             reward -= distance
         else:
-            reward -= np.linalg.norm(self.env.data.qvel[:2])
-            reward -= 5 * np.linalg.norm(self.env.data.qpos[:2] - self.start_position)
+            reward -= np.linalg.norm(self.velocity)
+            reward -= 5 * np.linalg.norm(self.position - self.start_position)
+        if self.env.sorting:
+            compatible = self.specialization == self.env.target_type
+            identified = self.detected_type >= 0
+            if not compatible and distance <= self.success_radius:
+                # Entering the collection radius of the wrong waste is a failure.
+                return float(reward - 10), False, distance
+            success = bool(self.go and identified and (not compatible or distance <= self.success_radius))
+            if success and not compatible:
+                # [found, x / 5, y / 5, material]: 1 plastic, 2 paper.
+                self.env.shared_comm[:] = [1, *self.env.target / 5, self.detected_type + 1]
         if success:
             reward += 10
+            self.completed = True
 
         # The next action receives go=1 once the waiting period is over.
         if not self.env.drone_training:
             self.go = int(self.env.steps >= self.go_delay)
         return float(reward), success, distance
+
+    def update_rays(self):
+        geomids, distances = self.raycaster.perform_raycast(self.body_id, self.ray_length)
+        self.ray_geomids[:] = geomids
+        self.ray_distances[:] = distances
+        self.ray_types.fill(4)
+        hits = geomids >= 0
+        self.ray_types[hits] = self.env.ray_geom_types[geomids[hits]]
+        seen = self.ray_types[self.ray_types < 2]
+        if seen.size:
+            self.detected_type = int(seen[0])
+
+    def get_ray_observation(self):
+        """Nine rows: normalized distance and five one-hot semantic categories."""
+        observation = np.zeros((self.ray_count, 6), dtype=np.float32)
+        observation[:, 0] = np.where(
+            self.ray_distances < 0, self.ray_length, self.ray_distances,
+        ) / self.ray_length
+        observation[np.arange(self.ray_count), 1 + self.ray_types] = 1
+        return observation
+
+    def render_rays(self, viewer):
+        color = (1.0, 0.8, 0.05, 1.0) if self.name == "robot" else (0.1, 0.75, 1.0, 1.0)
+        self.raycaster.render_rays(self.body_id, self.ray_length, viewer, color)
 
 
 class DroneAgent:
@@ -155,7 +259,7 @@ class DroneAgent:
         rays[:, 1] = self.is_bottle
         position = self.env.data.xpos[self.body_id, :2] / self.area_half_size
         return np.concatenate((
-            self.env.shared_comm, np.clip(position, -1, 1), rays.ravel(),
+            self.env.shared_comm[:3], np.clip(position, -1, 1), rays.ravel(),
             self.visited_map.ravel(),
         )).astype(np.float32)
 
@@ -231,19 +335,7 @@ class DroneAgent:
 
     def render_rays(self, viewer):
         self.update_rays()
-        for sensor_id, distance in zip(self.sensor_ids, self.ray_distances):
-            length = self.ray_length if distance < 0 else distance
-            origin = self.raycaster.raycast_origins_buf[sensor_id]
-            direction = self.raycaster.raycast_ray_dirs_buf[sensor_id][0]
-            end = origin + direction * length
-            geom = mujoco.MjvGeom()
-            mujoco.mjv_initGeom(
-                geom, mujoco.mjtGeom.mjGEOM_LINE, np.zeros(3), np.zeros(3),
-                np.eye(3).ravel(), np.array([1.0, 0.05, 0.02, 1.0], dtype=np.float32),
-            )
-            mujoco.mjv_connector(geom, mujoco.mjtGeom.mjGEOM_LINE, 2.0, origin, end)
-            viewer.add_marker(
-                type=mujoco.mjtGeom.mjGEOM_LINE,
-                pos=geom.pos.copy(), mat=geom.mat.ravel().copy(),
-                size=geom.size.copy(), rgba=geom.rgba.copy(), label="",
+        for sensor_id in self.sensor_ids:
+            self.raycaster.render_rays(
+                sensor_id, self.ray_length, viewer, (1.0, 0.05, 0.02, 1.0),
             )

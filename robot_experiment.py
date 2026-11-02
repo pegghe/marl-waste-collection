@@ -91,8 +91,11 @@ class SuccessVecEnv(MultiAgentSharedVecEnv):
 
 
 class RobotExperiment:
-    def __init__(self, model_path="models/ppo_go/final_model"):
-        self.model_path = model_path
+    def __init__(self, model_path=None, sorting=False):
+        self.sorting = sorting
+        self.model_path = model_path or (
+            "models/ppo_sorting/final_model" if sorting else "models/ppo_go/final_model"
+        )
 
     def model_directory(self, agent):
         return Path("models/ppo_drone") if agent == "drone" else Path(self.model_path).parent
@@ -141,10 +144,11 @@ class RobotExperiment:
             except FileExistsError:
                 run_number += 1
         self.last_run_directory = output
-        robot_env = RobotMAEnv(drone_training=agent == "drone")
+        robot_env = RobotMAEnv(drone_training=agent == "drone", sorting=self.sorting)
         drone = robot_env.env.drone
         (output / "config.json").write_text(json.dumps({
             "agent": agent, "requested_steps": steps,
+            "sorting": self.sorting,
             "resume_from": str(checkpoint.resolve()) if checkpoint else None,
             "robot_model": str(Path(self.model_path).resolve()) if agent == "drone" else None,
             "drone_search": {
@@ -190,7 +194,7 @@ class RobotExperiment:
                 models_to_load=models_to_load,
                 total_timesteps_per_model=steps,
                 training_iterations=1,
-                tb_log_suffix=f"{agent}_{run_id}",
+                tb_log_suffix=f"{agent}_{'sorting_' if self.sorting else ''}{run_id}",
             )
             env.save(output / "final_model_vecnormalize.pkl")
             models[agent].save(output / "final_model.zip")
@@ -200,7 +204,7 @@ class RobotExperiment:
             env.close()
 
     def evaluate(self, episodes=10, render=False, agent="robot", best=False, model=None,
-                 debug_actions=False):
+                 debug_actions=False, two_robots=False):
         checkpoint = self.resolve_model(agent, model, best)
         print(f"Evaluating: {checkpoint}")
         robot_path = checkpoint if agent == "robot" else self.model_path
@@ -211,6 +215,8 @@ class RobotExperiment:
         env = RobotMAEnv(
             render_mode="human" if render else None, drone_training=agent == "drone",
             finish_on_discovery=False,
+            two_robots=two_robots,
+            sorting=self.sorting,
         )
         env.env.drone.debug_actions = debug_actions
         try:
@@ -238,21 +244,30 @@ if __name__ == "__main__":
     parser.add_argument("--best", action="store_true",
                         help="Evaluate the selected agent's best_model instead of final_model")
     parser.add_argument("--render", action="store_true")
+    parser.add_argument("--two-robots", action="store_true",
+                        help="Evaluate two independently controlled robots with head-mounted rays")
+    parser.add_argument("--sorting", action="store_true",
+                        help="Train/evaluate one robot with random plastic/paper specialization and semantic rays")
     parser.add_argument("--debug-actions", action="store_true",
                         help="Print drone actions, requested/actual positions, speed and boundary blocking during evaluation")
     parser.add_argument("--episodes", type=int, default=10)
     args = parser.parse_args()
     if args.debug_actions and (args.mode != "evaluate" or args.agent != "drone"):
         parser.error("--debug-actions requires evaluate --agent drone")
+    if args.two_robots and args.mode != "evaluate":
+        parser.error("--two-robots is currently supported in evaluate mode")
+    if args.sorting and (args.agent != "robot" or args.two_robots):
+        parser.error("--sorting requires --agent robot and one robot")
 
     if args.mode == "train" and args.model is not None and not args.resume:
         parser.error("--model requires --resume when training")
     if args.mode == "train" and args.best:
         parser.error("--best is for evaluation; resume a best checkpoint with --model path/to/best_model.zip")
-    experiment = RobotExperiment()
+    experiment = RobotExperiment(sorting=args.sorting)
     if args.mode == "train":
         experiment.train(agent=args.agent, steps=args.steps, resume=args.resume, model=args.model)
     else:
         experiment.evaluate(episodes=args.episodes, render=args.render, agent=args.agent,
-                            best=args.best, model=args.model, debug_actions=args.debug_actions)
+                            best=args.best, model=args.model, debug_actions=args.debug_actions,
+                            two_robots=args.two_robots)
 

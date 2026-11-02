@@ -10,10 +10,15 @@ import robot_experiment as experiment
 
 class VersionedTrainingTest(unittest.TestCase):
     def test_resume_preserves_source_and_writes_a_new_run(self):
+        for sorting in (False, True):
+            with self.subTest(sorting=sorting):
+                self.check_resume(sorting)
+
+    def check_resume(self, sorting):
         original_train = experiment.ma_train
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            runner = experiment.RobotExperiment(str(root / 'final_model'))
+            runner = experiment.RobotExperiment(str(root / 'final_model'), sorting=sorting)
 
             def short_training(**kwargs):
                 for _, params in kwargs['model_algo_map'].values():
@@ -39,8 +44,10 @@ class VersionedTrainingTest(unittest.TestCase):
             self.assertEqual(runner.resolve_model('robot', first), source)
             config = json.loads((second / 'config.json').read_text())
             self.assertEqual(config['resume_from'], str(source.resolve()))
+            self.assertEqual(config['sorting'], sorting)
             model = experiment.RolloutPPO.load(second / 'final_model.zip')
             self.assertEqual(model.num_timesteps, 16)
+            self.assertEqual(model.observation_space.shape, (65 if sorting else 7,))
             self.assertEqual(model.best_output, str(second))
             # Best must belong to the selected run; never silently use another run.
             with self.assertRaises(FileNotFoundError):

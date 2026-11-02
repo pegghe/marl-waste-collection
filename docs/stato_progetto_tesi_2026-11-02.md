@@ -150,7 +150,6 @@ Per confrontare i checkpoint è stato creato `compare_runs.py`, mantenendo le az
 
 Tutti i modelli hanno quindi incontrato la stessa sequenza di scenari. Sono state verificate esplicitamente le posizioni iniziali del robot e del target fra i sei checkpoint. Il reset del drone usa lo stesso generatore dell'ambiente. Stesso seed non implica stesse azioni: le policy sono differenti e reagiscono alle proprie osservazioni.
 
-Sono stati completati 600 episodi: sei checkpoint per 100 episodi. Tutti hanno usato l'ambiente corrente; non sono state ricostruite le versioni storiche della simulazione. Nel confronto originario `run_001` è stata esclusa per input 23 anziché 219 e `run_002`/`run_004` non contenevano checkpoint best/final.
 
 ## 14. Risultati
 
@@ -175,6 +174,4 @@ In una precedente valutazione manuale era stato riportato il 65% per il best del
 
 Risultati per episodio: `output/comparison_seed_0_99/*.json`. Tabella aggregata: `output/comparison_seed_0_99/summary.csv`. Report del confronto: `output/comparison_seed_0_99/report.md`. Configurazioni e metriche di selezione: directory delle singole run. Andamento del training: log TensorBoard.
 
-Sono da distinguere dai risultati già ottenuti le possibili estensioni: valutazione su ulteriori seed, confronto `deterministic=False/True`, misura separata del tasso e del tempo di scoperta, analisi dei fallimenti del robot dopo la comunicazione, repliche di training con seed diversi e confronti controllati dei termini di reward. Non sono ancora documentati qui risultati per tali esperimenti.
 
-Prima di una nuova campagna conviene congelare una copia della versione dell'ambiente e associare ai risultati gli hash dei checkpoint e le versioni delle dipendenze. Le percentuali presenti descrivono lo stato verificato dal confronto già salvato.

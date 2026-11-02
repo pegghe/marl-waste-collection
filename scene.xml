@@ -18,6 +18,8 @@
       <geom name="robot_body" type="cylinder" size="0.18 0.15" mass="0" rgba="0 0 0 0"/>
       <body name="robot_visual">
         <!-- Decorative quadruped shell; rotates toward the target independently of XY motion. -->
+        <!-- Head-mounted sensor: +X points forward; ray elevations are set in Python. -->
+        <body name="robot_head_sensor" pos="0.35 0 0.19"/>
         <geom name="dog_torso" type="box" pos="0 0 0.17" size="0.235 0.105 0.075" mass="0" contype="0" conaffinity="0" rgba="0.96 0.70 0.04 1"/>
         <geom name="dog_back" type="box" pos="-0.025 0 0.251" size="0.16 0.081 0.012" mass="0" contype="0" conaffinity="0" rgba="0.10 0.12 0.14 1"/>
         <geom name="dog_belly" type="box" pos="0 0 0.105" size="0.19 0.085 0.025" mass="0" contype="0" conaffinity="0" rgba="0.12 0.14 0.16 1"/>
@@ -54,6 +56,9 @@
       <geom type="cylinder" pos="0 0 0.23" size="0.04 0.06" rgba="0.95 0.95 0.95 1" contype="0" conaffinity="0"/>
       <geom type="cylinder" pos="0 0 0.305" size="0.047 0.025" rgba="1 0.25 0.03 1" contype="0" conaffinity="0"/>
       <geom type="cylinder" pos="0 0 -0.025" size="0.092 0.065" rgba="1 0.25 0.03 1" contype="0" conaffinity="0"/>
+    </body>
+    <body name="paper" pos="1 1 0.065">
+      <geom type="box" size="0.14 0.10 0.06" rgba="0.88 0.82 0.68 1" contype="0" conaffinity="0"/>
     </body>
     <body name="drone" mocap="true" pos="0 0 3">
       <geom type="box" size="0.09 0.09 0.035" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>

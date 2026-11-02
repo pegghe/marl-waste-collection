@@ -242,3 +242,89 @@ The robot has a yellow-and-black quadruped appearance inspired by Spot, with
 four bent legs, rubber feet, and a front sensor panel. These parts are decorative:
 the existing XY controls, collision cylinder, mass, and inertia are preserved.
 The legs do not articulate; locomotion still uses the existing sliding joints.
+
+## Two robots and head-mounted rays
+
+To preview two robots using the existing navigation policy:
+
+```bash
+python robot_experiment.py evaluate --two-robots --render --episodes 1
+```
+
+The yellow `robot` and blue `robot_2` have independent XY controls and share the
+selected navigation policy. Both advance in one 0.05 s physics step. Their random
+starts are at least 1 m apart and 0.75 m from the target. Add `--agent drone` to
+wait for the drone's broadcast. Without `--two-robots`, there is one robot;
+the two-robot CLI mode currently supports evaluation only.
+
+Each robot, including in single-robot mode, has nine rays originating at the
+front of its head. Three horizontal angles (-60, 0, +60 degrees) combine with
+three downward pitches (0, 15, 30 degrees), giving nine rays with a 2 m range.
+The rays follow the head's orientation and ignore the emitting robot and floor.
+They are yellow for `robot`, cyan for `robot_2`, and red for the drone.
+
+Reset and step info expose independent sensor snapshots:
+
+```python
+sensors = info["robot_sensors"]["robot_2"]  # or "robot"
+distances = sensors["distances"]          # nine distances; -1 for no hit
+geomids = sensors["geomids"]              # nine geometry IDs; -1 for no hit
+types = sensors["types"]                  # 0 plastic, 1 paper, 2 obstacle, 3 robot, 4 none
+```
+
+Without `--sorting`, the PPO input remains seven navigation values. There is
+one shared bottle. In two-robot mode both must reach within
+0.25 m of it with `go=1`. Each robot receives its success bonus once, then zero
+motor commands and reward while the other finishes. This differs from the
+historical single-robot evaluation task.
+
+## Single-robot material training
+
+```bash
+python robot_experiment.py train --sorting --steps 600000
+python robot_experiment.py evaluate --sorting --render --episodes 10
+```
+
+Each episode has one robot and one visible waste item. Robot specialization
+and waste material are independently sampled as plastic or paper. Positions,
+the random go delay and the two XY motor actions follow the original task.
+Robot and waste centers start at least 3 m apart, outside initial ray detection.
+The paper object replaces the bottle in paper episodes. There are no static
+obstacles or second robot in this training mode.
+
+The float32 policy observation contains 65 values:
+
+| Indices | Meaning |
+|---|---|
+| 0:7 | Original navigation observation, including go |
+| 7:9 | Robot specialization: plastic/paper one-hot |
+| 9:11 | Material previously detected: plastic/paper bits, both zero if unknown |
+| 11:65 | Nine ray readings, each [distance/2, plastic, paper, obstacle, robot, none] |
+
+Ray categories are one-hot. A missing hit has normalized distance 1. Material
+is revealed only by actual ray intersections and remembered for the episode;
+the simulator does not supply the hidden material directly to the policy.
+This is simulated semantic sensing, not learned image classification.
+
+After go, matching waste is automatically collected when the robot is within
+0.25 m and has identified it. Incompatible waste is automatically reported at
+the first identification outside that radius. Both outcomes end the episode
+successfully with a +10 bonus, in addition to the existing navigation reward.
+Entering the 0.25 m radius of incompatible waste ends the episode as a failure
+with an extra -10 penalty. The limit is evaluated on the robot-center distance;
+it is a training objective, not a movement clamp. Timeouts are failures.
+Reporting is a programmed communication rule, not an additional learned action.
+
+In sorting mode `info["shared_comm"]` contains
+`[found, target_x/5, target_y/5, material]`, with material 0 unknown, 1 plastic,
+2 paper. It is zero until an incompatible item is reported, and resets each
+episode. Step info also exposes `specialization`, `target_type`, `collected`,
+`reported`, `wrong_target` and `is_success`. Success rate combines successful
+collections and reports. The drone policy is inactive in this mode.
+
+Models are saved separately under `models/ppo_sorting/runs/`, and TensorBoard
+names include `sorting`. Start a new model: the old seven-input checkpoints
+cannot be resumed with the 65-input observation. Subsequent sorting runs can
+use the existing `--resume`, `--model` and `--best` options. The flag is limited
+to `--agent robot` with one robot; legacy robot/drone modes remain selectable
+without `--sorting`.
