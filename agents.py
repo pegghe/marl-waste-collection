@@ -31,6 +31,10 @@ class RobotAgent:
         self.max_turn_speed = np.deg2rad(120.0)
         self.turn_response_time = 0.3
         self.success_radius = 0.25
+        self.robot_safe_distance = 0.8  # Center-to-center clearance, in metres.
+        self.robot_proximity_weight = 2.0
+        self.robot_collision_penalty = 10.0
+        self.avoidance_reward = 0.0
         self.observation_space = env.observation_space
         self.action_space = spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
         self.ray_length = 2.0
@@ -160,6 +164,7 @@ class RobotAgent:
         )).astype(np.float32)
 
     def compute_reward(self):
+        self.avoidance_reward = 0.0
         distance = float(np.linalg.norm(self.env.target - self.position))
         if self.completed:
             return 0.0, True, distance
@@ -178,6 +183,8 @@ class RobotAgent:
                 return float(reward - 10), False, distance
             if self.env.two_robots and self.name != self.env.active_robot:
                 return 0.0, False, distance
+            self.avoidance_reward = self.compute_avoidance_reward()
+            reward += self.avoidance_reward
             success = bool(self.go and identified and (not compatible or distance <= self.success_radius))
             if success and not compatible:
                 # Material: 0 unknown, 1 plastic, 2 cardboard, 3 reserved.
@@ -190,6 +197,24 @@ class RobotAgent:
         if not self.env.drone_active and not (self.env.sorting and self.env.two_robots):
             self.go = int(self.env.steps >= self.go_delay)
         return float(reward), success, distance
+
+    def compute_avoidance_reward(self):
+        """Train clearance without replacing the policy's movement commands."""
+        if not self.go or not self.env.two_robots:
+            return 0.0
+        others = [robot for robot in self.env.robots.values() if robot is not self]
+        distance = min(np.linalg.norm(self.position - robot.position) for robot in others)
+        proximity = max(0.0, 1.0 - distance / self.robot_safe_distance)
+        # Physics contacts, rather than semantic rays, establish actual collision.
+        own_group = 1 if self.name == "robot" else 2
+        other_group = 3 - own_group
+        collision = any(
+            {int(self.env.model.geom_group[c.geom1]), int(self.env.model.geom_group[c.geom2])}
+            == {own_group, other_group}
+            for c in self.env.data.contact
+        )
+        return float(-self.robot_proximity_weight * proximity
+                     - self.robot_collision_penalty * collision)
 
     def update_rays(self):
         geomids, distances = self.raycaster.perform_raycast(self.body_id, self.ray_length)

@@ -404,6 +404,29 @@ with two agents this can correspond to 50 shared episodes.
 
 ## Drone search before robot dispatch
 
+### Learning to avoid the other robot
+
+Two-robot sorting now adds a proximity cost inside 0.8 m (center to center),
+linearly increasing to -2 per step, and -10 per step with robot-to-robot physics
+contact. Only the active robot receives these costs. The existing navigation
+reward still encourages reaching and collecting the waste. Movement remains
+controlled by PPO; there is no automatic steering around the other robot.
+The 76-input observation is unchanged and includes semantic robot rays.
+`info["robot_avoidance_rewards"]` exposes each robot's added reward; training
+configurations record the clearance and penalty values.
+
+Continue a compatible sorting checkpoint with:
+
+```bash
+python robot_experiment.py train --sorting --two-robots --resume --steps 600000
+python robot_experiment.py evaluate --sorting --two-robots --render --episodes 10
+```
+
+The dispatcher still moves only one robot at a time: this trains passage around
+a stationary teammate, not simultaneous crossing. Random starts do not guarantee
+an encounter every episode. Validate avoidance in close encounters before using
+the policy with the drone; training completion alone does not establish safety.
+
 ```bash
 python robot_experiment.py evaluate --sorting --two-robots --render --episodes 10 \
   --drone-model models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip

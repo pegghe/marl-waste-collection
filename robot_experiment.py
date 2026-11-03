@@ -156,6 +156,11 @@ class RobotExperiment:
             "drone_model": str(drone_checkpoint.resolve()) if drone_checkpoint else None,
             "team_bonus": robot_env.env.team_bonus if self.sorting and two_robots else 0,
             "robot_observation_size": robot_env.env.observation_space.shape[0],
+            "robot_avoidance": {
+                "safe_distance": robot_env.env.robot.robot_safe_distance,
+                "proximity_weight": robot_env.env.robot.robot_proximity_weight,
+                "collision_penalty": robot_env.env.robot.robot_collision_penalty,
+            } if self.sorting and two_robots else None,
             "resume_from": str(checkpoint.resolve()) if checkpoint else None,
             "robot_model": str(Path(self.model_path).resolve()) if agent == "drone" else None,
             "drone_search": {

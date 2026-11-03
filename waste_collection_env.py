@@ -219,6 +219,9 @@ class WasteCollectionEnv(MujocoEnv):
         info = {
             "distance": distance, "is_success": success,
             "individual_rewards": {name: result[0] for name, result in results.items()},
+            "robot_avoidance_rewards": {
+                name: robot.avoidance_reward for name, robot in self.robots.items()
+            },
             "robot_successes": {name: result[1] for name, result in results.items()},
             "robot_sensors": self.get_robot_sensors(),
             "drone_ray_distances": self.drone.ray_distances.copy(),
