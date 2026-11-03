@@ -254,8 +254,8 @@ python robot_experiment.py evaluate --two-robots --render --episodes 1
 The yellow `robot` and blue `robot_2` have independent XY controls and share the
 selected navigation policy. Both advance in one 0.05 s physics step. Their random
 starts are at least 1 m apart and 0.75 m from the target. Add `--agent drone` to
-wait for the drone's broadcast. Without `--two-robots`, there is one robot;
-the two-robot CLI mode currently supports evaluation only.
+wait for the drone's broadcast. Without `--two-robots`, there is one robot.
+Both training and evaluation support the two-robot mode.
 
 Each robot, including in single-robot mode, has nine rays originating at the
 front of its head. Three horizontal angles (-60, 0, +60 degrees) combine with
@@ -269,7 +269,7 @@ Reset and step info expose independent sensor snapshots:
 sensors = info["robot_sensors"]["robot_2"]  # or "robot"
 distances = sensors["distances"]          # nine distances; -1 for no hit
 geomids = sensors["geomids"]              # nine geometry IDs; -1 for no hit
-types = sensors["types"]                  # 0 plastic, 1 paper, 2 obstacle, 3 robot, 4 none
+types = sensors["types"]                  # 0 plastic, 1 cardboard, 2 reserved, 3 obstacle, 4 robot, 5 none
 ```
 
 Without `--sorting`, the PPO input remains seven navigation values. There is
@@ -292,14 +292,20 @@ Robot and waste centers start at least 3 m apart, outside initial ray detection.
 The paper object replaces the bottle in paper episodes. There are no static
 obstacles or second robot in this training mode.
 
-The float32 policy observation contains 65 values:
+The float32 policy observation reserves three materials and contains 76 values:
 
 | Indices | Meaning |
 |---|---|
 | 0:7 | Original navigation observation, including go |
-| 7:9 | Robot specialization: plastic/paper one-hot |
-| 9:11 | Material previously detected: plastic/paper bits, both zero if unknown |
-| 11:65 | Nine ray readings, each [distance/2, plastic, paper, obstacle, robot, none] |
+| 7:10 | Robot specialization: plastic/cardboard/material_c one-hot |
+| 10:13 | Material previously detected: three bits, all zero if unknown |
+| 13:76 | Nine rays: [distance/2, plastic, cardboard, material_c, obstacle, robot, none] |
+
+`material_c` is reserved: episodes still sample only plastic and cardboard.
+No third waste object or robot has been added. To activate it later, add its
+scene geometry, map its ray category to 2, and enable it in the spawn sampling.
+The policy observation will stay at 76 values, but the policy will still need
+training examples of that material to learn the new behavior.
 
 Ray categories are one-hot. A missing hit has normalized distance 1. Material
 is revealed only by actual ray intersections and remembered for the episode;
@@ -317,14 +323,106 @@ Reporting is a programmed communication rule, not an additional learned action.
 
 In sorting mode `info["shared_comm"]` contains
 `[found, target_x/5, target_y/5, material]`, with material 0 unknown, 1 plastic,
-2 paper. It is zero until an incompatible item is reported, and resets each
+2 cardboard, 3 reserved. It is zero until an incompatible item is reported, and resets each
 episode. Step info also exposes `specialization`, `target_type`, `collected`,
 `reported`, `wrong_target` and `is_success`. Success rate combines successful
-collections and reports. The drone policy is inactive in this mode.
+collections and reports. The drone policy is inactive unless `--drone-model` is supplied.
 
 Models are saved separately under `models/ppo_sorting/runs/`, and TensorBoard
-names include `sorting`. Start a new model: the old seven-input checkpoints
-cannot be resumed with the 65-input observation. Subsequent sorting runs can
-use the existing `--resume`, `--model` and `--best` options. The flag is limited
-to `--agent robot` with one robot; legacy robot/drone modes remain selectable
-without `--sorting`.
+names include `sorting`. Start a new model: the old seven-input and 65-input
+checkpoints cannot be resumed directly with the 76-input observation. Subsequent sorting runs can
+use the existing `--resume`, `--model` and `--best` options. Training uses one
+robot unless `--two-robots` is set; legacy modes remain selectable without `--sorting`.
+
+## Two sorting robots with the shared PPO policy
+
+```bash
+python robot_experiment.py evaluate --sorting --two-robots --render --episodes 10
+```
+
+MASB3's `BaseMAEnv` registers `robot` and `robot_2` with the same
+`model_name="robot"`, as in the Multiagents examples. `set_agent_models` binds
+both to the single loaded PPO model; `ma_evaluate` batches their observations
+into one `predict` call. Each receives its own 76-value observation and XY action.
+A single-robot sorting checkpoint trained with 76 inputs can be used directly.
+
+The yellow `robot` always specializes in plastic, and the blue `robot_2` in
+cardboard. Cardboard uses the existing paper geometry (material index 1), named
+`cardboard` in info. Single- and two-robot modes have the same policy input layout.
+Single-robot training still randomizes the specialization. There is still one
+randomly typed waste item, at least 3 m from both robots. Only the closest robot
+is initially assigned to it. Assignment uses center-to-target Euclidean distance;
+an exact tie selects `robot`. The assignment stays fixed while it approaches.
+The assigned robot receives `go=1`; the other receives `go=0` and its requested
+actions are ignored. This replaces the random go delay only in two-robot sorting.
+
+An incompatible robot reports and stops, transferring the assignment to the
+closest available compatible robot. Its message supplies the waste material
+to its teammate's existing observation memory, including when that teammate has
+not seen the waste with its own rays. A report alone no longer ends a two-robot
+episode: success requires collection by the compatible robot. Either robot
+entering the wrong collection radius causes failure; timeout also remains a
+failure. `info["robot_specializations"]` identifies the roles by agent name.
+`info["active_robot"]` identifies the current assignee, or is `None` after task
+termination. Unassigned robots are held at their current positions with zero
+velocity, including after a handoff; this prevents inertia or contact from
+moving a waiting robot. The PPO observation remains 76 values.
+
+## Joint training and team reward
+
+```bash
+python robot_experiment.py train --sorting --two-robots --steps 600000
+python robot_experiment.py train --sorting --two-robots --steps 600000 --resume
+```
+
+The training wrapper uses MASB3's `MultiAgentSharedVecEnv` with both robot IDs
+as learning agents. Their transitions update a single shared PPO policy, as in
+the push example. A 76-input single-robot checkpoint can be resumed with two
+robots; seven-input or 65-input checkpoints require adaptation first.
+
+Each robot receives its individual reward plus a team component:
+
+- Individual: existing waiting/navigation penalties, +10 for its first correct
+  collection or incompatible-waste report, -10 for entering the wrong radius.
+  In two-robot sorting, an unassigned robot has zero individual reward while
+  waiting, unless it violates the wrong collection radius.
+- Team: +10 to each robot when compatible collection completes the task without
+  a wrong-radius violation. This includes a robot that already reported and
+  stopped. Reports alone, failures and timeouts earn no team bonus.
+
+The team bonus is paid once per episode and applies only to two-robot sorting.
+It is set by `WasteCollectionEnv.team_bonus`. Step info exposes
+`individual_rewards`, the shared scalar `team_reward`, and combined
+`robot_rewards`, which are the values consumed by MASB3 and PPO. Config files
+record the robot count, observation size and team bonus.
+
+`--steps` counts learning transitions: with two robots, one world step supplies
+two transitions. PPO still collects full rollouts (2,048 world steps, or 4,096
+transitions with two robots). Episode limits remain measured in world steps.
+Best-model selection averages the last 100 completed agent-episode returns;
+with two agents this can correspond to 50 shared episodes.
+
+## Drone search before robot dispatch
+
+```bash
+python robot_experiment.py evaluate --sorting --two-robots --render --episodes 10 \
+  --drone-model models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip
+```
+
+With `--drone-model`, both robots wait with go=0 and a hidden target vector until
+the drone detects waste. The drone's rays recognize both the plastic bottle and
+the cardboard box as generic waste; they do not distinguish material. Its old
+`is_bottle` sensor flag now means any waste in sorting mode. The 219-value drone
+observation retains its format, so existing map-based drone policies can be loaded.
+
+Detection broadcasts `[1, target_x/5, target_y/5, 0]`. Material 0 means unknown;
+it must not be interpreted as a robot's classification. The nearest robot is
+assigned only after that message. The drone then stops moving. Material is
+subsequently recognized by robot rays and, when incompatible, reported with the
+fourth field set to 1 for plastic or 2 for cardboard. The compatible robot
+receives the handoff. Drone discovery alone does not terminate the episode or
+pay the robot team bonus: compatible collection is still required.
+
+The same `--drone-model` option can be used with `train --sorting --two-robots`.
+Only the shared robot policy is updated; the loaded drone policy stays frozen.
+`--agent drone` remains the separate legacy drone-training mode.

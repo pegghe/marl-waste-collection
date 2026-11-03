@@ -40,7 +40,7 @@ class RobotSortingTest(unittest.TestCase):
             cases.add((self.env.robot.specialization, self.env.target_type))
             self.assertGreaterEqual(np.linalg.norm(self.env.target - self.env.robot.position), 3.0)
             self.assertEqual(self.env.robot.detected_type, -1)
-            self.assertEqual(observation.shape, (65,))
+            self.assertEqual(observation.shape, (76,))
             self.assertTrue(self.env.observation_space.contains(observation))
             repeated, _ = self.env.reset(seed=seed)
             np.testing.assert_array_equal(observation, repeated)
@@ -52,11 +52,11 @@ class RobotSortingTest(unittest.TestCase):
         for material in (0, 1):
             self.place(0, material, target=(-1.2, 0))
             observation = self.env._get_obs()
-            np.testing.assert_array_equal(observation[7:9], [1, 0])
-            np.testing.assert_array_equal(observation[9:11], [0, 0])
-            rays = observation[11:].reshape(9, 6)
+            np.testing.assert_array_equal(observation[7:10], [1, 0, 0])
+            np.testing.assert_array_equal(observation[10:13], [0, 0, 0])
+            rays = observation[13:].reshape(9, 7)
             np.testing.assert_array_equal(rays[:, 0], 1)
-            np.testing.assert_array_equal(rays[:, 5], 1)  # No object.
+            np.testing.assert_array_equal(rays[:, 6], 1)  # No object.
             np.testing.assert_array_equal(rays[:, 1:].sum(axis=1), 1)
             observations.append(observation)
         np.testing.assert_array_equal(*observations)
@@ -64,7 +64,7 @@ class RobotSortingTest(unittest.TestCase):
             self.place(material, material)
             self.assertIn(material, self.env.robot.ray_types)
             self.assertEqual(self.env.robot.detected_type, material)
-            self.assertTrue(self.env._get_obs()[9 + material])
+            self.assertTrue(self.env._get_obs()[10 + material])
 
     def test_both_specializations_collect_only_after_identifying_matching_waste(self):
         for material in (0, 1):
@@ -142,8 +142,34 @@ class RobotSortingTest(unittest.TestCase):
         self.env.data.mocap_pos[self.env.drone.mocap_id] = [1, 0, 0.35]
         mujoco.mj_forward(self.env.model, self.env.data)
         self.env.robot.update_rays()
-        self.assertEqual(self.env.robot.ray_types[1], 2)
+        self.assertEqual(self.env.robot.ray_types[1], 3)
         self.assertEqual(self.env.robot.detected_type, -1)
+
+    def test_reserved_material_can_be_recognized_collected_and_reported(self):
+        # Use the bottle as a stand-in only in this test; no third object spawns.
+        for specialization in (0, 2):
+            with self.subTest(specialization=specialization):
+                self.place(specialization, 0)
+                self.env.target_type = 2
+                self.env.ray_geom_types[self.env.drone.target_geom_ids] = 2
+                self.env.robot.update_rays()
+                observation = self.env._get_obs()
+                self.assertEqual(observation[7 + specialization], 1)
+                self.assertEqual(observation[12], 1)
+                self.assertTrue(np.any(observation[13:].reshape(9, 7)[:, 3]))
+                _, _, terminated, _, info = self.env.step(np.zeros(2))
+                if specialization == 0:
+                    self.assertTrue(terminated)
+                    self.assertTrue(info['reported'])
+                    self.assertEqual(info['shared_comm'][3], 3)
+                else:
+                    self.assertFalse(terminated)
+                    qpos = self.env.data.qpos.copy()
+                    qpos[self.env.robot.qpos_indices] = [1.0, 0]
+                    self.env.set_state(qpos, np.zeros(self.env.model.nv))
+                    _, _, terminated, _, info = self.env.step(np.zeros(2))
+                    self.assertTrue(terminated)
+                    self.assertTrue(info['collected'])
 
 
 if __name__ == '__main__':

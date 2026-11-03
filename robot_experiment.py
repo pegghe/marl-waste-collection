@@ -124,12 +124,14 @@ class RobotExperiment:
             raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
         return checkpoint
 
-    def train(self, agent="robot", steps=600_000, resume=False, model=None):
+    def train(self, agent="robot", steps=600_000, resume=False, model=None, two_robots=False,
+              drone_model=None):
         if steps < 1:
             raise ValueError("steps must be positive")
         if model is not None and not resume:
             raise ValueError("Use --resume with --model when training")
         checkpoint = self.resolve_model(agent, model) if resume else None
+        drone_checkpoint = self.resolve_model("drone", drone_model) if drone_model is not None else None
         runs_directory = self.model_directory(agent) / "runs"
         runs_directory.mkdir(parents=True, exist_ok=True)
         numbers = [int(path.name[4:]) for path in runs_directory.iterdir()
@@ -144,11 +146,16 @@ class RobotExperiment:
             except FileExistsError:
                 run_number += 1
         self.last_run_directory = output
-        robot_env = RobotMAEnv(drone_training=agent == "drone", sorting=self.sorting)
+        robot_env = RobotMAEnv(drone_training=agent == "drone", sorting=self.sorting,
+                               two_robots=two_robots, drone_search=drone_checkpoint is not None)
         drone = robot_env.env.drone
         (output / "config.json").write_text(json.dumps({
             "agent": agent, "requested_steps": steps,
             "sorting": self.sorting,
+            "two_robots": two_robots,
+            "drone_model": str(drone_checkpoint.resolve()) if drone_checkpoint else None,
+            "team_bonus": robot_env.env.team_bonus if self.sorting and two_robots else 0,
+            "robot_observation_size": robot_env.env.observation_space.shape[0],
             "resume_from": str(checkpoint.resolve()) if checkpoint else None,
             "robot_model": str(Path(self.model_path).resolve()) if agent == "drone" else None,
             "drone_search": {
@@ -162,7 +169,8 @@ class RobotExperiment:
             print(f"Resuming from: {checkpoint}")
         torch.set_num_threads(1)
         robot_env.reset(seed=0)
-        env = SuccessVecEnv(robot_env, learning_agent_ids=[agent])
+        learning_ids = list(robot_env.env.robots) if agent == "robot" else [agent]
+        env = SuccessVecEnv(robot_env, learning_agent_ids=learning_ids)
         env = VecMonitor(env)
         normalization_path = checkpoint.with_name(checkpoint.stem + "_vecnormalize.pkl") if checkpoint else None
         if normalization_path is not None and normalization_path.is_file():
@@ -183,6 +191,10 @@ class RobotExperiment:
             agent_env_map["robot"] = MultiAgentSharedVecEnv(robot_env, ["robot"])
             model_algo_map["robot"] = (algo, params)
             models_to_load = {"robot": self.model_path}
+        if drone_checkpoint is not None:
+            agent_env_map["drone"] = MultiAgentSharedVecEnv(robot_env, ["drone"])
+            model_algo_map["drone"] = (algo, params)
+            models_to_load = {"drone": str(drone_checkpoint)}
         if resume:
             models_to_load = {**(models_to_load or {}), agent: str(checkpoint)}
         try:
@@ -204,7 +216,7 @@ class RobotExperiment:
             env.close()
 
     def evaluate(self, episodes=10, render=False, agent="robot", best=False, model=None,
-                 debug_actions=False, two_robots=False):
+                 debug_actions=False, two_robots=False, drone_model=None):
         checkpoint = self.resolve_model(agent, model, best)
         print(f"Evaluating: {checkpoint}")
         robot_path = checkpoint if agent == "robot" else self.model_path
@@ -212,13 +224,18 @@ class RobotExperiment:
         models = {"robot": robot_model}
         if agent == "drone":
             models["drone"] = get_algo("sb3", "PPO").load(checkpoint, device="cpu")
+        if drone_model is not None:
+            drone_checkpoint = self.resolve_model("drone", drone_model)
+            models["drone"] = get_algo("sb3", "PPO").load(drone_checkpoint, device="cpu")
         env = RobotMAEnv(
             render_mode="human" if render else None, drone_training=agent == "drone",
             finish_on_discovery=False,
             two_robots=two_robots,
             sorting=self.sorting,
+            drone_search=drone_model is not None,
         )
         env.env.drone.debug_actions = debug_actions
+        env.set_agent_models(models)
         try:
             avg_agent, avg_model = ma_evaluate(
                 env, models, total_episodes=episodes, verbose=True,
@@ -245,19 +262,21 @@ if __name__ == "__main__":
                         help="Evaluate the selected agent's best_model instead of final_model")
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--two-robots", action="store_true",
-                        help="Evaluate two independently controlled robots with head-mounted rays")
+                        help="Train/evaluate two robots sharing the same PPO policy")
     parser.add_argument("--sorting", action="store_true",
-                        help="Train/evaluate one robot with random plastic/paper specialization and semantic rays")
+                        help="Train/evaluate plastic/cardboard specialists with semantic rays")
+    parser.add_argument("--drone-model", type=Path,
+                        help="Use a frozen drone checkpoint to locate waste before dispatching sorting robots")
     parser.add_argument("--debug-actions", action="store_true",
                         help="Print drone actions, requested/actual positions, speed and boundary blocking during evaluation")
     parser.add_argument("--episodes", type=int, default=10)
     args = parser.parse_args()
     if args.debug_actions and (args.mode != "evaluate" or args.agent != "drone"):
         parser.error("--debug-actions requires evaluate --agent drone")
-    if args.two_robots and args.mode != "evaluate":
-        parser.error("--two-robots is currently supported in evaluate mode")
-    if args.sorting and (args.agent != "robot" or args.two_robots):
-        parser.error("--sorting requires --agent robot and one robot")
+    if args.sorting and args.agent != "robot":
+        parser.error("--sorting requires --agent robot")
+    if args.drone_model is not None and (not args.sorting or args.agent != "robot"):
+        parser.error("--drone-model requires --sorting --agent robot")
 
     if args.mode == "train" and args.model is not None and not args.resume:
         parser.error("--model requires --resume when training")
@@ -265,9 +284,10 @@ if __name__ == "__main__":
         parser.error("--best is for evaluation; resume a best checkpoint with --model path/to/best_model.zip")
     experiment = RobotExperiment(sorting=args.sorting)
     if args.mode == "train":
-        experiment.train(agent=args.agent, steps=args.steps, resume=args.resume, model=args.model)
+        experiment.train(agent=args.agent, steps=args.steps, resume=args.resume, model=args.model,
+                         two_robots=args.two_robots, drone_model=args.drone_model)
     else:
         experiment.evaluate(episodes=args.episodes, render=args.render, agent=args.agent,
                             best=args.best, model=args.model, debug_actions=args.debug_actions,
-                            two_robots=args.two_robots)
+                            two_robots=args.two_robots, drone_model=args.drone_model)
 

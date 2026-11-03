@@ -63,7 +63,7 @@ class RobotHeadRaysTest(unittest.TestCase):
                 self.assertGreaterEqual(geom_id, 0)
                 other_group = 2 if name == 'robot' else 1
                 self.assertEqual(self.env.model.geom_group[geom_id], other_group)
-                self.assertEqual(robot.ray_types[1], 3)
+                self.assertEqual(robot.ray_types[1], 4)
                 origin = robot.raycaster.raycast_origins_buf[robot.body_id]
                 np.testing.assert_allclose(origin[:2], robot.position + [0.35, 0], atol=1e-5)
                 self.assertAlmostEqual(origin[2], 0.35, places=5)

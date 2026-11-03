@@ -10,7 +10,10 @@ from raycast import Raycaster
 class RobotAgent:
     """Robot observations, waiting behavior, and navigation reward."""
 
-    ray_categories = ("plastic", "paper", "obstacle", "robot", "none")
+    material_count = 3
+    ray_categories = ("plastic", "cardboard", "material_c", "obstacle", "robot", "none")
+    ray_count = 9
+    sorting_observation_size = 7 + 2 * material_count + ray_count * (1 + len(ray_categories))
 
     def __init__(self, env, name="robot"):
         self.env = env
@@ -31,7 +34,6 @@ class RobotAgent:
         self.observation_space = env.observation_space
         self.action_space = spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
         self.ray_length = 2.0
-        self.ray_count = 9
         # Ignore this robot (group 1 or 2) and the floor (group 3).
         geomgroup = np.ones(6, dtype=np.uint8)
         geomgroup[1 if name == "robot" else 2] = 0
@@ -50,7 +52,7 @@ class RobotAgent:
                                     local_directions=directions)
         self.ray_distances = np.full(self.ray_count, -1.0)
         self.ray_geomids = np.full(self.ray_count, -1, dtype=np.int32)
-        self.ray_types = np.full(self.ray_count, 4, dtype=np.int32)
+        self.ray_types = np.full(self.ray_count, len(self.ray_categories) - 1, dtype=np.int32)
 
     @property
     def position(self):
@@ -64,9 +66,11 @@ class RobotAgent:
         env = self.env
         env.model.body_quat[self.visual_body_id] = [1, 0, 0, 0]
         self.go_delay = env.np_random.integers(0, 101)
-        self.go = 0 if env.drone_training else int(self.go_delay == 0)
+        self.go = 0 if env.drone_active else int(self.go_delay == 0)
         self.completed = False
         self.specialization = int(env.np_random.integers(2)) if env.sorting else 0
+        if env.sorting and env.two_robots:
+            self.specialization = int(self.name == "robot_2")
         self.detected_type = -1
         if qpos is None:
             qpos = env.init_qpos.copy()
@@ -85,8 +89,10 @@ class RobotAgent:
         return qpos
 
     def control(self, action):
+        if self.env.sorting and self.env.two_robots and self.name != self.env.active_robot:
+            return np.zeros(2)
         # As in the thesis, ground-agent actions stay zero until detection.
-        if self.env.drone_training and not self.env.shared_comm[0]:
+        if self.env.drone_active and not self.env.shared_comm[0]:
             return np.zeros(2)
         if self.completed:
             return np.zeros(2)
@@ -100,13 +106,13 @@ class RobotAgent:
 
     def face_target(self):
         env = self.env
-        if env.drone_training:
+        if not self.go:
+            return
+        if env.drone_active:
             if not env.shared_comm[0]:
                 return
-            target = env.shared_comm[1:] * env.drone.area_half_size
+            target = env.shared_comm[1:3] * env.drone.area_half_size
         else:
-            if not self.go:
-                return
             target = env.target
         direction = target - self.position
         if np.linalg.norm(direction) < 1e-8:
@@ -127,11 +133,12 @@ class RobotAgent:
 
     def get_observation(self):
         # The robot only receives the target broadcast after drone detection.
-        if self.env.drone_training:
-            self.go = int(bool(self.env.shared_comm[0]))
+        if self.env.drone_active:
+            if not (self.env.sorting and self.env.two_robots):
+                self.go = int(bool(self.env.shared_comm[0]))
             relative_target = (
-                self.env.shared_comm[1:] * self.env.drone.area_half_size - self.position
-                if self.go else np.zeros(2)
+                self.env.shared_comm[1:3] * self.env.drone.area_half_size - self.position
+                if self.env.shared_comm[0] else np.zeros(2)
             )
         else:
             relative_target = self.env.target - self.position
@@ -143,10 +150,12 @@ class RobotAgent:
         ))
         if not self.env.sorting:
             return navigation
+        if self.env.shared_comm[3]:
+            self.detected_type = int(self.env.shared_comm[3]) - 1
         return np.concatenate((
             navigation,
-            [self.specialization == 0, self.specialization == 1],
-            [self.detected_type == 0, self.detected_type == 1],
+            [self.specialization == kind for kind in range(self.material_count)],
+            [self.detected_type == kind for kind in range(self.material_count)],
             self.get_ray_observation().ravel(),
         )).astype(np.float32)
 
@@ -167,16 +176,18 @@ class RobotAgent:
             if not compatible and distance <= self.success_radius:
                 # Entering the collection radius of the wrong waste is a failure.
                 return float(reward - 10), False, distance
+            if self.env.two_robots and self.name != self.env.active_robot:
+                return 0.0, False, distance
             success = bool(self.go and identified and (not compatible or distance <= self.success_radius))
             if success and not compatible:
-                # [found, x / 5, y / 5, material]: 1 plastic, 2 paper.
+                # Material: 0 unknown, 1 plastic, 2 cardboard, 3 reserved.
                 self.env.shared_comm[:] = [1, *self.env.target / 5, self.detected_type + 1]
         if success:
             reward += 10
             self.completed = True
 
         # The next action receives go=1 once the waiting period is over.
-        if not self.env.drone_training:
+        if not self.env.drone_active and not (self.env.sorting and self.env.two_robots):
             self.go = int(self.env.steps >= self.go_delay)
         return float(reward), success, distance
 
@@ -184,16 +195,16 @@ class RobotAgent:
         geomids, distances = self.raycaster.perform_raycast(self.body_id, self.ray_length)
         self.ray_geomids[:] = geomids
         self.ray_distances[:] = distances
-        self.ray_types.fill(4)
+        self.ray_types.fill(len(self.ray_categories) - 1)
         hits = geomids >= 0
         self.ray_types[hits] = self.env.ray_geom_types[geomids[hits]]
-        seen = self.ray_types[self.ray_types < 2]
+        seen = self.ray_types[self.ray_types < self.material_count]
         if seen.size:
             self.detected_type = int(seen[0])
 
     def get_ray_observation(self):
-        """Nine rows: normalized distance and five one-hot semantic categories."""
-        observation = np.zeros((self.ray_count, 6), dtype=np.float32)
+        """Nine rows: normalized distance and one-hot semantic categories."""
+        observation = np.zeros((self.ray_count, 1 + len(self.ray_categories)), dtype=np.float32)
         observation[:, 0] = np.where(
             self.ray_distances < 0, self.ray_length, self.ray_distances,
         ) / self.ray_length
@@ -229,8 +240,9 @@ class DroneAgent:
         self.blocked_fraction = 0.0
         self.last_movement = 0.0
         self.debug_actions = False
-        target_body_id = self.env.model.body("target").id
-        self.target_geom_ids = np.flatnonzero(self.env.model.geom_bodyid == target_body_id)
+        target_bodies = ("target", "paper") if env.sorting else ("target",)
+        target_body_ids = [env.model.body(name).id for name in target_bodies]
+        self.target_geom_ids = np.flatnonzero(np.isin(env.model.geom_bodyid, target_body_ids))
         self.cell_size = 0.5
         # Rows follow world Y and columns follow world X, starting at the lower bounds.
         map_size = int(np.ceil(2 * env.area_half_size / self.cell_size))
@@ -279,7 +291,7 @@ class DroneAgent:
                 remaining = max(0.0, 1.0 - (self.env.steps - 1) / self.env.max_steps)
                 components["discovery"] = self.discovery_bonus * remaining
                 self.env.shared_comm[0] = 1.0
-                self.env.shared_comm[1:] = self.env.target / self.area_half_size
+                self.env.shared_comm[1:3] = self.env.target / self.area_half_size
             else:
                 components["time"] = -0.05
                 components["boundary"] = -self.boundary_penalty * self.blocked_fraction

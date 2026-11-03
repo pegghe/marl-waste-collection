@@ -20,18 +20,19 @@ class WasteCollectionEnv(MujocoEnv):
     }
 
     def __init__(self, render_mode=None, drone_training=False, finish_on_discovery=None,
-                 two_robots=False, sorting=False):
-        if sorting and (two_robots or drone_training):
-            raise ValueError("Sorting training uses one robot without a drone policy")
+                 two_robots=False, sorting=False, drone_search=False):
+        if sorting and drone_training:
+            raise ValueError("Sorting mode does not use a drone policy")
         self.sorting = sorting
         self.two_robots = two_robots
         self.drone_training = drone_training
+        self.drone_active = drone_training or drone_search
         self.finish_on_discovery = drone_training if finish_on_discovery is None else finish_on_discovery
         super().__init__(
             model_path=str(Path(__file__).with_name("scene.xml")),
             frame_skip=5,
             observation_space=spaces.Box(
-                -np.inf, np.inf, shape=(65 if sorting else 7,),
+                -np.inf, np.inf, shape=(RobotAgent.sorting_observation_size if sorting else 7,),
                 dtype=np.float32 if sorting else np.float64,
             ),
             render_mode=render_mode,
@@ -44,15 +45,16 @@ class WasteCollectionEnv(MujocoEnv):
         self.spawn_half_size = 3.0
         self.min_spawn_distance = 3.0 if sorting else 0.75
         self.max_steps = 2000
+        self.team_bonus = 10.0
         self.robot = RobotAgent(self)
         self.robots = {"robot": self.robot}
         if two_robots:
             self.robots["robot_2"] = RobotAgent(self, "robot_2")
         self.drone = DroneAgent(self)
-        # Ray categories: plastic, paper, obstacle, other robot, no hit.
-        self.ray_geom_types = np.full(self.model.ngeom, 2, dtype=np.int32)
-        self.ray_geom_types[np.isin(self.model.geom_group, [1, 2])] = 3
-        self.ray_geom_types[self.drone.target_geom_ids] = 0
+        # Three material slots, then obstacle, other robot and no hit.
+        self.ray_geom_types = np.full(self.model.ngeom, RobotAgent.material_count, dtype=np.int32)
+        self.ray_geom_types[np.isin(self.model.geom_group, [1, 2])] = RobotAgent.material_count + 1
+        self.ray_geom_types[self.model.geom_bodyid == self.model.body("target").id] = 0
         if sorting:
             self.ray_geom_types[self.model.geom_bodyid == self.model.body("paper").id] = 1
         self.drone_action_space = self.drone.action_space
@@ -104,6 +106,12 @@ class WasteCollectionEnv(MujocoEnv):
         info["robot_sensors"] = self.get_robot_sensors()
         if self.sorting:
             info["shared_comm"] = self.shared_comm.copy()
+            if self.two_robots:
+                info["active_robot"] = self.active_robot
+            info["robot_specializations"] = {
+                name: RobotAgent.ray_categories[robot.specialization]
+                for name, robot in self.robots.items()
+            }
         return obs, info
 
     def get_robot_sensors(self):
@@ -132,6 +140,7 @@ class WasteCollectionEnv(MujocoEnv):
 
     def reset_model(self):
         self.steps = 0
+        self.team_reward_given = False
         qpos = self.robot.reset()
         if self.two_robots:
             qpos = self.robots["robot_2"].reset(qpos)
@@ -141,16 +150,36 @@ class WasteCollectionEnv(MujocoEnv):
                 self.model.body(body).pos[:2] = self.target if kind == self.target_type else [20, 20]
         else:
             self.model.body("target").pos[:2] = self.target
-        self.drone.reset_position(randomize=self.drone_training)
+        self.drone.reset_position(randomize=self.drone_active)
         self.set_state(qpos, self.init_qvel.copy())
         self.shared_comm = np.zeros(4 if self.sorting else 3, dtype=np.float32)
+        if self.sorting and self.two_robots:
+            self.assign_robot()
         self.drone.reset()
         for robot in self.robots.values():
             robot.update_rays()
         return self._get_obs()
 
     def move_drone(self, action):
+        if self.sorting and self.shared_comm[0]:
+            return
         self.drone.apply_action(action)
+
+    def assign_robot(self, material=None):
+        target = self.shared_comm[1:3] * self.drone.area_half_size if self.drone_active else self.target
+        candidates = [
+            name for name, robot in self.robots.items()
+            if not robot.completed and (material is None or robot.specialization == material)
+            and (not self.drone_active or self.shared_comm[0])
+        ]
+        self.active_robot = min(
+            candidates, key=lambda name: np.linalg.norm(self.robots[name].position - target),
+            default=None,
+        )
+        for name, robot in self.robots.items():
+            robot.go = int(name == self.active_robot)
+            if not robot.go:
+                self.data.qvel[robot.qvel_indices] = 0
 
     def advance_robots(self, action):
         """Apply every motor command in one shared physics step."""
@@ -158,9 +187,20 @@ class WasteCollectionEnv(MujocoEnv):
         if action.shape != (self.model.nu,):
             raise ValueError(f"Expected joint robot action shape {(self.model.nu,)}")
         controls = np.zeros(self.model.nu)
+        stationary = {}
         for robot in self.robots.values():
             controls[robot.actuator_ids] = robot.control(action[robot.actuator_ids])
+            if self.sorting and self.two_robots and robot.name != self.active_robot:
+                stationary[robot.name] = robot.position.copy()
+                self.data.qvel[robot.qvel_indices] = 0
         self.do_simulation(controls, self.frame_skip)
+        # Keep unassigned robots stationary, including under inertia or contact.
+        for name, position in stationary.items():
+            robot = self.robots[name]
+            self.data.qpos[robot.qpos_indices] = position
+            self.data.qvel[robot.qvel_indices] = 0
+        if stationary:
+            mujoco.mj_forward(self.model, self.data)
         for robot in self.robots.values():
             robot.face_target()
 
@@ -170,24 +210,22 @@ class WasteCollectionEnv(MujocoEnv):
         for robot in self.robots.values():
             robot.update_rays()
         results = {name: robot.compute_reward() for name, robot in self.robots.items()}
-        reward, _, distance = results["robot"]
+        distance = results["robot"][2]
         success = all(result[1] for result in results.values())
         self.drone.update_rays()
-        if not self.sorting:
+        if not self.sorting or self.drone_active:
             self.drone.compute_reward()
-        if self.render_mode == "human":
-            self.render()
 
         info = {
             "distance": distance, "is_success": success,
-            "robot_rewards": {name: result[0] for name, result in results.items()},
+            "individual_rewards": {name: result[0] for name, result in results.items()},
             "robot_successes": {name: result[1] for name, result in results.items()},
             "robot_sensors": self.get_robot_sensors(),
             "drone_ray_distances": self.drone.ray_distances.copy(),
             "drone_ray_geomids": self.drone.ray_geomids.copy(),
             "drone_reward": self.drone.reward,
             "drone_reward_components": self.drone.reward_components.copy(),
-            "drone_found_target": bool(self.shared_comm[0]) and not self.sorting,
+            "drone_found_target": bool(self.shared_comm[0]) and self.drone_active,
             "drone_observation": self.get_drone_observation(),
             "drone_visited_map": self.drone.visited_map.copy(),
             "drone_speed": self.drone.last_movement / self.dt,
@@ -196,25 +234,56 @@ class WasteCollectionEnv(MujocoEnv):
         terminated = bool(self.shared_comm[0]) if self.finish_on_discovery else success
         info["is_success"] = terminated
         if self.sorting:
-            wrong_target = (
-                self.robot.specialization != self.target_type and distance <= self.robot.success_radius
+            wrong_target = any(
+                robot.specialization != self.target_type and results[name][2] <= robot.success_radius
+                for name, robot in self.robots.items()
             )
+            collected = any(
+                robot.completed and robot.specialization == self.target_type
+                for robot in self.robots.values()
+            )
+            success = (collected if self.two_robots else success) and not wrong_target
             terminated = success or wrong_target
+            if self.two_robots:
+                if terminated:
+                    self.active_robot = None
+                    for robot in self.robots.values():
+                        robot.go = 0
+                        self.data.qvel[robot.qvel_indices] = 0
+                elif self.active_robot is None and self.shared_comm[0]:
+                    self.assign_robot()
+                elif self.active_robot is not None and self.robots[self.active_robot].completed:
+                    self.assign_robot(int(self.shared_comm[3]) - 1)
+                info["active_robot"] = self.active_robot
             info.update(
                 is_success=success, wrong_target=wrong_target,
-                collected=success and self.robot.specialization == self.target_type,
-                reported=bool(self.shared_comm[0]),
+                collected=collected,
+                reported=bool(self.shared_comm[3]),
                 shared_comm=self.shared_comm.copy(),
                 specialization=RobotAgent.ray_categories[self.robot.specialization],
+                robot_specializations={
+                    name: RobotAgent.ray_categories[robot.specialization]
+                    for name, robot in self.robots.items()
+                },
                 target_type=RobotAgent.ray_categories[self.target_type],
             )
         truncated = self.steps >= self.max_steps and not terminated
-        return self._get_obs(), float(reward), terminated, truncated, info
+        team_reward = 0.0
+        if self.sorting and self.two_robots and success and not self.team_reward_given:
+            team_reward = self.team_bonus
+            self.team_reward_given = True
+        info["team_reward"] = team_reward
+        info["robot_rewards"] = {
+            name: individual + team_reward for name, individual in info["individual_rewards"].items()
+        }
+        if self.render_mode == "human":
+            self.render()
+        return self._get_obs(), info["robot_rewards"]["robot"], terminated, truncated, info
 
 
 class RobotMAEnv(BaseMAEnv):
     def __init__(self, render_mode=None, drone_training=False, finish_on_discovery=None,
-                 two_robots=False, sorting=False):
+                 two_robots=False, sorting=False, drone_search=False):
         super().__init__()
         self.drone_training = drone_training
         self.episode_successes = []
@@ -223,11 +292,12 @@ class RobotMAEnv(BaseMAEnv):
             finish_on_discovery=finish_on_discovery,
             two_robots=two_robots,
             sorting=sorting,
+            drone_search=drone_search,
         )
         for name, robot in self.env.robots.items():
             self.register_agent(name, robot.observation_space, robot.action_space,
                                 model_name="robot")
-        if drone_training:
+        if self.env.drone_active:
             self.register_agent("drone", self.env.drone_observation_space, self.env.drone_action_space)
 
     def reset(self, seed=None):
@@ -245,7 +315,7 @@ class RobotMAEnv(BaseMAEnv):
             self.action[self.env.robots[agent_id].actuator_ids] = action
 
     def sync_wait_for_actions_completion(self):
-        if self.drone_training:
+        if self.env.drone_active:
             self.env.move_drone(self.drone_action)
         self.observation, self.reward, self.terminated, self.truncated, self.info = (
             self.env.step(self.action)
@@ -260,7 +330,7 @@ class RobotMAEnv(BaseMAEnv):
 
     def evaluate_env_state(self):
         rewards = self.info["robot_rewards"].copy()
-        if self.drone_training:
+        if self.env.drone_active:
             rewards["drone"] = self.env.drone_reward
         return rewards, self.terminated, self.truncated, self.info
 
