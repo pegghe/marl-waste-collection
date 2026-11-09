@@ -122,6 +122,35 @@ python robot_experiment.py train --agent drone --steps 600000
 Previous runs are preserved. Resume or evaluate only drone models trained with
 the exploration map. The saved robot policy can still be used as before.
 
+## Border-penalty baseline
+
+The drone uses the original 219-value observation, permanent 14 × 14 visited
+map, default MLP actor/critic with hidden layers [64, 64], seed 0, and the
+original reward described above. Drone training uses learning rate 0.0001,
+matching `models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip`.
+Robot training retains learning rate 0.0003. CNN and recent-memory observations
+are no longer used. Their 415- and 2,210-input checkpoints cannot run in this
+environment; the old 219-input border-penalty checkpoints are compatible again.
+
+Evaluate the reference checkpoint explicitly:
+
+```bash
+python robot_experiment.py evaluate --agent drone --render \
+  --model models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip
+```
+
+To continue from it for 200,000 additional steps in a new run:
+
+```bash
+python robot_experiment.py train --agent drone --steps 200000 --resume \
+  --model models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip
+```
+
+Always pass the reference path: the default model selection uses the latest
+completed run, which may belong to the discarded experimental observation format.
+The historical 85% was a rolling training success rate, not a guaranteed evaluation
+result. Existing model and TensorBoard artifacts are preserved.
+
 ## Train only the drone
 
 ```bash

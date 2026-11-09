@@ -188,7 +188,7 @@ class RobotExperiment:
         params = {
             "policy": "MlpPolicy", "seed": 0, "device": "cpu", "verbose": 1,
             "tensorboard_log": "./tensorboard_logs/",
-             "learning_rate": 0.0003,
+            "learning_rate": 0.0003 if agent == "drone" else 0.0003,
         }
         model_algo_map = {agent: (RolloutPPO, {**params, "best_output": str(output)})}
         models_to_load = None
