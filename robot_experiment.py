@@ -167,6 +167,9 @@ class RobotExperiment:
                 "speed": drone.speed, "min_search_speed": drone.min_search_speed,
                 "boundary_penalty": drone.boundary_penalty,
                 "stagnation_penalty": drone.stagnation_penalty,
+                "oscillation_window_steps": drone.oscillation_window_steps,
+                "oscillation_max_span": drone.oscillation_max_span,
+                "oscillation_penalty": drone.oscillation_penalty,
             } if agent == "drone" else None,
         }, indent=2) + "\n")
         print(f"Training output: {output}")

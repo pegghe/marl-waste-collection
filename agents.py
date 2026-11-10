@@ -1,5 +1,7 @@
 """Agent behavior for the shared waste collection simulation."""
 
+from collections import deque
+
 import mujoco
 import numpy as np
 from gymnasium import spaces
@@ -262,6 +264,11 @@ class DroneAgent:
         self.min_search_speed = 0.3
         self.boundary_penalty = 0.2
         self.stagnation_penalty = 0.05
+        self.oscillation_window_steps = 50
+        self.oscillation_max_span = 0.3  # Metres, measured across the whole window.
+        self.oscillation_penalty = 0.05
+        self._search_positions = deque(maxlen=self.oscillation_window_steps + 1)
+        self._search_new_cells = deque(maxlen=self.oscillation_window_steps)
         self.blocked_fraction = 0.0
         self.last_movement = 0.0
         self.debug_actions = False
@@ -300,15 +307,28 @@ class DroneAgent:
             self.visited_map.ravel(),
         )).astype(np.float32)
 
+    def _update_search_history(self, new_cell):
+        """Detect confinement over a full window without any new cell visits."""
+        self._search_positions.append(self.env.data.xpos[self.body_id, :2].copy())
+        self._search_new_cells.append(bool(new_cell))
+        if (len(self._search_positions) < self._search_positions.maxlen
+                or any(self._search_new_cells)):
+            return False
+        # Use the bounding-box diagonal, not just start-to-end displacement:
+        # a useful wide loop returning to its starting point must not count.
+        span = np.linalg.norm(np.ptp(np.asarray(self._search_positions), axis=0))
+        return span <= self.oscillation_max_span
+
     def compute_reward(self):
         components = {
             "time": 0.0, "exploration": 0.0, "discovery": 0.0,
-            "boundary": 0.0, "stagnation": 0.0,
+            "boundary": 0.0, "stagnation": 0.0, "oscillation": 0.0,
         }
         cell = self.cell()
         new_cell = not self.visited_map[cell]
         self.visited_map[cell] = 1.0
         if not self.env.shared_comm[0]:
+            oscillating = self._update_search_history(new_cell)
             detected = self.is_bottle.any()
             if new_cell:
                 components["exploration"] = 0.5
@@ -325,6 +345,8 @@ class DroneAgent:
                     0, 1,
                 )
                 components["stagnation"] = -self.stagnation_penalty * slow_fraction
+                if oscillating:
+                    components["oscillation"] = -self.oscillation_penalty
         self.reward_components = components
         self.reward = sum(components.values())
 
@@ -362,12 +384,15 @@ class DroneAgent:
         self.update_rays()
         self.visited_map.fill(0.0)
         self.visited_map[self.cell()] = 1.0
+        self._search_positions.clear()
+        self._search_positions.append(self.env.data.xpos[self.body_id, :2].copy())
+        self._search_new_cells.clear()
         self.blocked_fraction = 0.0
         self.last_movement = 0.0
         self.reward = 0.0
         self.reward_components = {
             "time": 0.0, "exploration": 0.0, "discovery": 0.0,
-            "boundary": 0.0, "stagnation": 0.0,
+            "boundary": 0.0, "stagnation": 0.0, "oscillation": 0.0,
         }
 
     def render_rays(self, viewer):

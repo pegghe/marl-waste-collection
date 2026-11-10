@@ -85,9 +85,18 @@ During search, commands clipped by the movement limits also receive a
 Moving inward or along a boundary has no boundary cost. Actual speeds below
 0.3 m/s receive a linear `stagnation` cost: -0.05 when stationary, falling to
 zero at 0.3 m/s. These costs are additional to the -0.05 time cost and are zero
-on discovery and afterwards. A fully blocked outward command costs -0.3 per
-step; staying still costs -0.1. The maximum speed remains 1 m/s per axis.
+on discovery and afterwards. Before the oscillation cost below applies, a fully
+blocked outward command costs -0.3 per step; staying still costs -0.1.
+The maximum speed remains 1 m/s per axis.
 Step info exposes `drone_speed` in m/s and `drone_blocked_fraction` in [0, 1].
+An additional `oscillation` cost of -0.05 per step applies after 50 steps
+(2.5 s) confined to a region whose bounding-box diagonal is at most 0.3 m,
+with no new cell visited during those steps. The window includes its starting
+position and all 50 subsequent positions, so wide loops are not penalized merely
+for returning to their start. A new cell visit prevents this cost for the next
+50-step window. History is cleared at reset, and this cost is zero on discovery
+and afterwards. It appears in `drone_reward_components["oscillation"]` and
+stacks with the existing time, boundary and stagnation costs.
 In drone mode, discovery ends the episode; robot success does not end it.
 The robot's training reward remains unchanged.
 
@@ -126,8 +135,9 @@ the exploration map. The saved robot policy can still be used as before.
 
 The drone uses the original 219-value observation, permanent 14 × 14 visited
 map, default MLP actor/critic with hidden layers [64, 64], seed 0, and the
-original reward described above. Drone training uses learning rate 0.0001,
-matching `models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip`.
+original reward plus the oscillation cost described above. Drone training uses
+learning rate 0.0001, matching
+`models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip`.
 Robot training retains learning rate 0.0003. CNN and recent-memory observations
 are no longer used. Their 415- and 2,210-input checkpoints cannot run in this
 environment; the old 219-input border-penalty checkpoints are compatible again.

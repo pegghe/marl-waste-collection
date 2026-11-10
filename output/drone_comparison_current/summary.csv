@@ -1,0 +1,5 @@
+checkpoint,episodes,successes,success_rate,mean_steps,mean_drone_reward
+models/ppo_drone/runs/run_002/best_model.zip,100,81,0.81,852.37,-32.813746359298875
+models/ppo_drone/runs/border_penalty_1.4mln/best_model.zip,100,78,0.78,764.73,-25.37422057173102
+models/ppo_drone/runs/run_002/final_model.zip,100,76,0.76,897.2,-30.48828289593748
+models/ppo_drone/runs/anti_oscillation_best540k_eval33su40/best_model.zip,100,71,0.71,964.05,-29.246709239710707
