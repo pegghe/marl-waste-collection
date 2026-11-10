@@ -133,7 +133,16 @@ class WasteCollectionEnv(MujocoEnv):
         for robot in self.robots.values():
             robot.update_rays()
             robot.render_rays(viewer)
-        return super().render()
+        # Pose only the rendered frame, leaving sensing and physics in their base pose.
+        try:
+            for robot in self.robots.values():
+                robot.pose_legs()
+            mujoco.mj_kinematics(self.model, self.data)
+            return super().render()
+        finally:
+            for robot in self.robots.values():
+                self.model.body_quat[robot.leg_body_ids] = [1, 0, 0, 0]
+            mujoco.mj_kinematics(self.model, self.data)
 
     def _get_obs(self):
         return self.robot.get_observation()
@@ -203,6 +212,7 @@ class WasteCollectionEnv(MujocoEnv):
             mujoco.mj_forward(self.model, self.data)
         for robot in self.robots.values():
             robot.face_target()
+            robot.update_gait()
 
     def step(self, action):
         self.advance_robots(action)

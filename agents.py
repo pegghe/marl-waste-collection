@@ -24,6 +24,10 @@ class RobotAgent:
         self.body_id = env.model.body(name).id
         self.visual_body_id = env.model.body(prefix + "robot_visual").id
         self.sensor_id = env.model.body(prefix + "robot_head_sensor").id
+        self.leg_body_ids = np.array([
+            [env.model.body(prefix + f"dog_{leg}_{part}").id for part in ("leg", "shin")]
+            for leg in ("front_left", "front_right", "rear_left", "rear_right")
+        ])
         joints = [env.model.joint(prefix + axis).id for axis in ("x", "y")]
         self.qpos_indices = env.model.jnt_qposadr[joints].copy()
         self.qvel_indices = env.model.jnt_dofadr[joints].copy()
@@ -71,6 +75,9 @@ class RobotAgent:
     def reset(self, qpos=None):
         env = self.env
         env.model.body_quat[self.visual_body_id] = [1, 0, 0, 0]
+        env.model.body_quat[self.leg_body_ids] = [1, 0, 0, 0]
+        self.gait_phase = 0.0
+        self.gait_blend = 0.0
         self.go_delay = env.np_random.integers(0, 101)
         self.go = 0 if env.drone_active else int(self.go_delay == 0)
         self.completed = False
@@ -92,6 +99,7 @@ class RobotAgent:
                 position = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
         qpos[self.qpos_indices] = position
         self.start_position = position.copy()
+        self.last_gait_position = position.copy()
         return qpos
 
     def control(self, action):
@@ -136,6 +144,37 @@ class RobotAgent:
             np.cos(half_yaw), 0, 0, np.sin(half_yaw),
         ]
         mujoco.mj_forward(env.model, env.data)
+
+    def update_gait(self):
+        """Advance the visual walking cycle from actual distance travelled."""
+        distance = float(np.linalg.norm(self.position - self.last_gait_position))
+        self.last_gait_position = self.position.copy()
+        self.gait_phase = (self.gait_phase + 2 * np.pi * distance / 0.28) % (2 * np.pi)
+        motion = min(distance / (self.env.dt * 0.35), 1.0)
+        self.gait_blend += (motion - self.gait_blend) * (-np.expm1(-self.env.dt / 0.12))
+
+    def pose_legs(self):
+        """Pose diagonal leg pairs, keeping stance feet near the ground."""
+        phase = self.gait_phase + np.array([0, np.pi, np.pi, 0])
+        foot_x = 0.055 * self.gait_blend * np.sin(phase)
+        foot_z = -0.245 + 0.04 * self.gait_blend * np.maximum(0, np.cos(phase))
+
+        # Two-link inverse kinematics in each leg's vertical plane.
+        upper_squared = 0.065**2 + 0.125**2
+        lower_squared = 0.065**2 + 0.12**2
+        distance = np.hypot(foot_x, foot_z)
+        along = (upper_squared - lower_squared + distance**2) / (2 * distance)
+        height = np.sqrt(np.maximum(upper_squared - along**2, 0))
+        knee_x = (along * foot_x + height * foot_z) / distance
+        knee_z = (along * foot_z - height * foot_x) / distance
+        hip = np.arctan2(-0.065, 0.125) - np.arctan2(knee_x, -knee_z)
+        knee = np.arctan2(0.065, 0.12) - np.arctan2(foot_x - knee_x, knee_z - foot_z) - hip
+
+        half_angles = np.column_stack((hip, knee)) / 2
+        rotations = np.zeros((4, 2, 4))
+        rotations[:, :, 0] = np.cos(half_angles)
+        rotations[:, :, 2] = np.sin(half_angles)
+        self.env.model.body_quat[self.leg_body_ids] = rotations
 
     def get_observation(self):
         # The robot only receives the target broadcast after drone detection.

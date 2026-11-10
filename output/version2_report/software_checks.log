@@ -1,0 +1,114 @@
+test_edges_share_the_outer_cells_without_extra_exploration_bonus (test_drone_exploration_map.DroneExplorationMapTest.test_edges_share_the_outer_cells_without_extra_exploration_bonus) ... ok
+test_history_resets_and_rewards_stay_zero_after_discovery (test_drone_exploration_map.DroneExplorationMapTest.test_history_resets_and_rewards_stay_zero_after_discovery) ... ok
+test_movement_updates_history_and_only_rewards_first_visit (test_drone_exploration_map.DroneExplorationMapTest.test_movement_updates_history_and_only_rewards_first_visit) ... ok
+test_reset_observation_includes_map_and_preserves_sensor_fields (test_drone_exploration_map.DroneExplorationMapTest.test_reset_observation_includes_map_and_preserves_sensor_fields) ... ok
+test_discovery_and_reset_remove_search_penalties (test_drone_movement.DroneMovementTest.test_discovery_and_reset_remove_search_penalties) ... ok
+test_edge_penalty_charges_outward_commands_but_allows_return_and_sliding (test_drone_movement.DroneMovementTest.test_edge_penalty_charges_outward_commands_but_allows_return_and_sliding) ... ok
+test_partial_clipping_cost_is_proportional_and_corner_stays_bounded (test_drone_movement.DroneMovementTest.test_partial_clipping_cost_is_proportional_and_corner_stays_bounded) ... ok
+test_stagnation_cost_decreases_smoothly_with_actual_speed (test_drone_movement.DroneMovementTest.test_stagnation_cost_decreases_smoothly_with_actual_speed) ... ok
+test_useful_movement_keeps_original_speed_without_extra_penalties (test_drone_movement.DroneMovementTest.test_useful_movement_keeps_original_speed_without_extra_penalties) ... ok
+test_discovery_and_later_steps_do_not_charge_oscillation (test_drone_oscillation.DroneOscillationTest.test_discovery_and_later_steps_do_not_charge_oscillation) ... ok
+test_fast_small_oscillations_are_penalized_after_full_window (test_drone_oscillation.DroneOscillationTest.test_fast_small_oscillations_are_penalized_after_full_window) ... ok
+test_leaving_confined_region_removes_penalty_without_a_new_cell (test_drone_oscillation.DroneOscillationTest.test_leaving_confined_region_removes_penalty_without_a_new_cell) ... ok
+test_new_cell_protects_the_entire_recent_window (test_drone_oscillation.DroneOscillationTest.test_new_cell_protects_the_entire_recent_window) ... ok
+test_reset_clears_history_and_preserves_checkpoint_observation (test_drone_oscillation.DroneOscillationTest.test_reset_clears_history_and_preserves_checkpoint_observation) ... ok
+test_wide_closed_loop_is_not_oscillation_even_without_new_cells (test_drone_oscillation.DroneOscillationTest.test_wide_closed_loop_is_not_oscillation_even_without_new_cells) ... ok
+test_clearance_and_collision (test_robot_avoidance.RobotAvoidanceTests.test_clearance_and_collision) ... ok
+test_both_spawns_are_repeatable_and_clear (test_robot_head_rays.RobotHeadRaysTest.test_both_spawns_are_repeatable_and_clear) ... ok
+test_broadcast_releases_both_robots_and_reset_clears_actions (test_robot_head_rays.RobotHeadRaysTest.test_broadcast_releases_both_robots_and_reset_clears_actions) ... ok
+test_each_head_detects_plastic_and_ignores_its_own_shell (test_robot_head_rays.RobotHeadRaysTest.test_each_head_detects_plastic_and_ignores_its_own_shell) ... ok
+test_each_robot_finishes_once_while_other_can_continue (test_robot_head_rays.RobotHeadRaysTest.test_each_robot_finishes_once_while_other_can_continue) ... ok
+test_empty_rays_and_info_are_independent_snapshots (test_robot_head_rays.RobotHeadRaysTest.test_empty_rays_and_info_are_independent_snapshots) ... ok
+test_heads_follow_yaw_and_detect_other_robot (test_robot_head_rays.RobotHeadRaysTest.test_heads_follow_yaw_and_detect_other_robot) ... ok
+test_independent_controls_advance_physics_only_once (test_robot_head_rays.RobotHeadRaysTest.test_independent_controls_advance_physics_only_once) ... ok
+test_both_specializations_collect_only_after_identifying_matching_waste (test_robot_sorting.RobotSortingTest.test_both_specializations_collect_only_after_identifying_matching_waste) ... ok
+test_both_specializations_report_wrong_material_outside_collection_radius (test_robot_sorting.RobotSortingTest.test_both_specializations_report_wrong_material_outside_collection_radius) ... ok
+test_entering_wrong_collection_radius_is_a_failure_not_a_collection (test_robot_sorting.RobotSortingTest.test_entering_wrong_collection_radius_is_a_failure_not_a_collection) ... ok
+test_go_signal_still_controls_task_completion (test_robot_sorting.RobotSortingTest.test_go_signal_still_controls_task_completion) ... ok
+test_non_waste_geometry_is_an_obstacle (test_robot_sorting.RobotSortingTest.test_non_waste_geometry_is_an_obstacle) ... ok
+test_observation_contains_role_and_ray_types_without_revealing_unseen_material (test_robot_sorting.RobotSortingTest.test_observation_contains_role_and_ray_types_without_revealing_unseen_material) ... ok
+test_reserved_material_can_be_recognized_collected_and_reported (test_robot_sorting.RobotSortingTest.test_reserved_material_can_be_recognized_collected_and_reported) ... ok
+test_roles_and_waste_are_independent_and_reset_is_repeatable (test_robot_sorting.RobotSortingTest.test_roles_and_waste_are_independent_and_reset_is_repeatable) ... ok
+test_unseen_wrong_material_is_not_reported (test_robot_sorting.RobotSortingTest.test_unseen_wrong_material_is_not_reported) ... ok
+test_both_materials_are_detected_without_broadcasting_their_type (test_sorting_drone.SortingDroneTest.test_both_materials_are_detected_without_broadcasting_their_type) ... ok
+test_drone_location_then_robot_report_then_compatible_collection (test_sorting_drone.SortingDroneTest.test_drone_location_then_robot_report_then_compatible_collection) ... ok
+test_drone_training_still_ends_at_detection (test_target_communication.TargetCommunicationTest.test_drone_training_still_ends_at_detection) ... ok
+test_robot_actions_blocked_until_broadcast_and_after_reset (test_target_communication.TargetCommunicationTest.test_robot_actions_blocked_until_broadcast_and_after_reset) ... ok
+test_robot_only_mode_keeps_policy_control (test_target_communication.TargetCommunicationTest.test_robot_only_mode_keeps_policy_control) ... ok
+test_target_hidden_until_detection_and_robot_can_finish (test_target_communication.TargetCommunicationTest.test_target_hidden_until_detection_and_robot_can_finish) ... ok
+test_assignment_does_not_switch_when_distances_change_and_ties_are_stable (test_two_robot_sorting.TwoRobotSortingTest.test_assignment_does_not_switch_when_distances_change_and_ties_are_stable) ... ok
+test_collection_can_finish_without_a_report (test_two_robot_sorting.TwoRobotSortingTest.test_collection_can_finish_without_a_report) ... ok
+test_invalid_joint_completion_does_not_receive_team_bonus (test_two_robot_sorting.TwoRobotSortingTest.test_invalid_joint_completion_does_not_receive_team_bonus) ... ok
+test_masb3_batches_both_agents_into_one_shared_model (test_two_robot_sorting.TwoRobotSortingTest.test_masb3_batches_both_agents_into_one_shared_model) ... ok
+test_report_reaches_other_robot_and_episode_continues_until_collection (test_two_robot_sorting.TwoRobotSortingTest.test_report_reaches_other_robot_and_episode_continues_until_collection) ... ok
+test_resets_assign_complementary_roles_and_keep_both_spawns_distant (test_two_robot_sorting.TwoRobotSortingTest.test_resets_assign_complementary_roles_and_keep_both_spawns_distant) ... ok
+test_unassigned_robot_stays_still_and_has_no_individual_cost (test_two_robot_sorting.TwoRobotSortingTest.test_unassigned_robot_stays_still_and_has_no_individual_cost) ... ok
+test_wrong_radius_is_checked_for_both_robots (test_two_robot_sorting.TwoRobotSortingTest.test_wrong_radius_is_checked_for_both_robots) ... ok
+test_legacy_checkpoint_remains_selectable (test_versioned_training.VersionedTrainingTest.test_legacy_checkpoint_remains_selectable) ... ok
+test_resume_preserves_source_and_writes_a_new_run (test_versioned_training.VersionedTrainingTest.test_resume_preserves_source_and_writes_a_new_run) ... /home/rl/miniconda3/envs/rl/lib/python3.12/site-packages/stable_baselines3/common/callbacks.py:719: TqdmExperimentalWarning: rich is experimental/alpha
+  self.pbar = tqdm(total=self.locals["total_timesteps"] - self.model.num_timesteps)
+Training output: /tmp/tmpmsf1hb2p/runs/run_001
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpmsf1hb2p/runs/run_001/final_model.zip
+Training output: /tmp/tmpmsf1hb2p/runs/run_002
+Resuming from: /tmp/tmpmsf1hb2p/runs/run_001/final_model.zip
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpmsf1hb2p/runs/run_002/final_model.zip
+Training output: /tmp/tmpsd9m2kpp/runs/run_001
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpsd9m2kpp/runs/run_001/final_model.zip
+Training output: /tmp/tmpsd9m2kpp/runs/run_002
+Resuming from: /tmp/tmpsd9m2kpp/runs/run_001/final_model.zip
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpsd9m2kpp/runs/run_002/final_model.zip
+Training output: /tmp/tmp7zp14wh6/runs/run_001
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmp7zp14wh6/runs/run_001/final_model.zip
+Training output: /tmp/tmp7zp14wh6/runs/run_002
+Resuming from: /tmp/tmp7zp14wh6/runs/run_001/final_model.zip
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmp7zp14wh6/runs/run_002/final_model.zip
+Training output: /tmp/tmpcbt2r_vb/runs/run_001
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpcbt2r_vb/runs/run_001/final_model.zip
+Training output: /tmp/tmpcbt2r_vb/runs/run_002
+Resuming from: /tmp/tmpcbt2r_vb/runs/run_001/final_model.zip
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+ok
+test_sorting_training_keeps_drone_policy_frozen (test_versioned_training.VersionedTrainingTest.test_sorting_training_keeps_drone_policy_frozen) ... Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpcbt2r_vb/runs/run_002/final_model.zip
+Training output: /tmp/tmpypw3v003/robot/runs/run_001
+Training iteration 1 of 1...
+Training robot with RolloutPPO...
+ 100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16/8  [ 0:00:00 < 0:00:00 , ? it/s ]
+ok
+
+----------------------------------------------------------------------
+Ran 49 tests in 1.894s
+
+OK
+Best model not selected: fewer than 100 completed episodes. The final model will be saved as final_model.zip.
+Final model saved: /tmp/tmpypw3v003/robot/runs/run_001/final_model.zip

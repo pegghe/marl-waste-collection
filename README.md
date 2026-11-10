@@ -280,7 +280,12 @@ control during its original waiting exercise.
 The robot has a yellow-and-black quadruped appearance inspired by Spot, with
 four bent legs, rubber feet, and a front sensor panel. These parts are decorative:
 the existing XY controls, collision cylinder, mass, and inertia are preserved.
-The legs do not articulate; locomotion still uses the existing sliding joints.
+During rendering, the legs animate in diagonal pairs with hip and knee bending.
+The cycle follows actual distance travelled and settles back to the standing
+pose when the robot stops. Animation applies to both robot colours.
+Locomotion still uses the existing sliding joints: the visual poses are restored
+after each frame, so sensing, contacts, controls and saved policy shapes stay
+compatible. Existing checkpoints can be rendered without retraining.
 
 ## Two robots and head-mounted rays
 

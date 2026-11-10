@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-10",
+  "description": "Smoke test V2: two sorting robots, frozen official drone, seeds 0..3, stochastic PPO actions; no rendering.",
+  "models": {
+    "robot": {
+      "checkpoint": "models/ppo_sorting/runs/run_002/best_model.zip",
+      "sha256": "25543babf7924fff79a0ef5c4ffdec2e3991a461f88e0e7e633221cea8540a6a",
+      "num_timesteps": 1077248,
+      "observation_size": 76,
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "n_epochs": 10,
+      "gamma": 0.99,
+      "gae_lambda": 0.95,
+      "ent_coef": 0.0,
+      "seed": 0,
+      "net_arch": {
+        "pi": [
+          64,
+          64
+        ],
+        "vf": [
+          64,
+          64
+        ]
+      }
+    },
+    "drone": {
+      "checkpoint": "models/ppo_drone/runs/anti_oscillation_best/best_model.zip",
+      "sha256": "c349706d3eed933f769592809634ee5648d30dea9a981b4c8067942c989f0741",
+      "num_timesteps": 690176,
+      "observation_size": 219,
+      "learning_rate": 0.0003,
+      "n_steps": 2048,
+      "batch_size": 64,
+      "n_epochs": 10,
+      "gamma": 0.99,
+      "gae_lambda": 0.95,
+      "ent_coef": 0.0,
+      "seed": 0,
+      "net_arch": {
+        "pi": [
+          64,
+          64
+        ],
+        "vf": [
+          64,
+          64
+        ]
+      }
+    }
+  },
+  "episodes": 4,
+  "successes": 4,
+  "records": [
+    {
+      "seed": 0,
+      "steps_to_discovery": 120,
+      "total_steps": 271,
+      "success": true,
+      "reported": false,
+      "collected": true,
+      "drone_displacement_after_detection": 0.0
+    },
+    {
+      "seed": 1,
+      "steps_to_discovery": 137,
+      "total_steps": 435,
+      "success": true,
+      "reported": false,
+      "collected": true,
+      "drone_displacement_after_detection": 0.0
+    },
+    {
+      "seed": 2,
+      "steps_to_discovery": 278,
+      "total_steps": 400,
+      "success": true,
+      "reported": false,
+      "collected": true,
+      "drone_displacement_after_detection": 0.0
+    },
+    {
+      "seed": 3,
+      "steps_to_discovery": 330,
+      "total_steps": 590,
+      "success": true,
+      "reported": true,
+      "collected": true,
+      "drone_displacement_after_detection": 0.0
+    }
+  ]
+}
