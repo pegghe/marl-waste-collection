@@ -13,7 +13,7 @@ class RobotAgent:
     """Robot observations, waiting behavior, and navigation reward."""
 
     material_count = 3
-    ray_categories = ("plastic", "cardboard", "material_c", "obstacle", "robot", "none")
+    ray_categories = ("plastic", "cardboard", "residual", "obstacle", "robot", "none")
     ray_count = 9
     sorting_observation_size = 7 + 2 * material_count + ray_count * (1 + len(ray_categories))
 
@@ -231,7 +231,7 @@ class RobotAgent:
             reward += self.avoidance_reward
             success = bool(self.go and identified and (not compatible or distance <= self.success_radius))
             if success and not compatible:
-                # Material: 0 unknown, 1 plastic, 2 cardboard, 3 material_c.
+                # Material: 0 unknown, 1 plastic, 2 cardboard, 3 residual waste.
                 self.env.shared_comm[:] = [1, *self.env.target / 5, self.detected_type + 1]
         if success:
             reward += 10

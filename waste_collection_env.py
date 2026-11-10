@@ -102,7 +102,11 @@ class WasteCollectionEnv(MujocoEnv):
                 duplicate.set("name", name + "_" + motor.get("name"))
                 duplicate.set("joint", name + "_" + motor.get("joint"))
                 actuators.append(duplicate)
-        model = mujoco.MjModel.from_xml_string(ET.tostring(scene, encoding="unicode"))
+        assets = {
+            mesh.get("file"): (Path(self.fullpath).parent / mesh.get("file")).read_bytes()
+            for mesh in scene.findall("asset/mesh[@file]")
+        }
+        model = mujoco.MjModel.from_xml_string(ET.tostring(scene, encoding="unicode"), assets=assets)
         model.vis.global_.offwidth = self.width
         model.vis.global_.offheight = self.height
         return model, mujoco.MjData(model)

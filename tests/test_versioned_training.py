@@ -53,7 +53,7 @@ class VersionedTrainingTest(unittest.TestCase):
             self.assertEqual(config['two_robots'], resumed_count == 2)
             self.assertEqual(config['three_robots'], resumed_count == 3)
             self.assertEqual(config['robot_count'], resumed_count)
-            self.assertEqual(config['materials'], ['plastic', 'cardboard', 'material_c'][:
+            self.assertEqual(config['materials'], ['plastic', 'cardboard', 'residual'][:
                 3 if resumed_count == 3 else (2 if sorting else 1)
             ])
             self.assertEqual(config['team_bonus'], 10 if sorting and resumed_count > 1 else 0)

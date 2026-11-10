@@ -279,7 +279,7 @@ if __name__ == "__main__":
     team.add_argument("--two-robots", action="store_true",
                       help="Train/evaluate two robots sharing the same PPO policy")
     team.add_argument("--three-robots", action="store_true",
-                      help="Train/evaluate plastic/cardboard/material_c specialists with --sorting")
+                      help="Train/evaluate plastic/cardboard/residual-waste specialists with --sorting")
     parser.add_argument("--sorting", action="store_true",
                         help="Train/evaluate material specialists with semantic rays")
     parser.add_argument("--drone-model", type=Path,

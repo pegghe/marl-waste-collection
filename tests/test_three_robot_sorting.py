@@ -44,7 +44,7 @@ class ThreeRobotSortingTest(unittest.TestCase):
             positions = {name: robot.position.copy() for name, robot in self.env.robots.items()}
             materials.add(self.env.target_type)
             self.assertEqual(info['robot_specializations'], {
-                'robot': 'plastic', 'robot_2': 'cardboard', 'robot_3': 'material_c',
+                'robot': 'plastic', 'robot_2': 'cardboard', 'robot_3': 'residual',
             })
             self.assertEqual(self.env.model.nu, 6)
             for role, (name, robot) in enumerate(self.env.robots.items()):

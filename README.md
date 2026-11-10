@@ -313,7 +313,7 @@ Reset and step info expose independent sensor snapshots:
 sensors = info["robot_sensors"]["robot_2"]  # or "robot"
 distances = sensors["distances"]          # nine distances; -1 for no hit
 geomids = sensors["geomids"]              # nine geometry IDs; -1 for no hit
-types = sensors["types"]                  # 0 plastic, 1 cardboard, 2 reserved, 3 obstacle, 4 robot, 5 none
+types = sensors["types"]                  # 0 plastic, 1 cardboard, 2 residual, 3 obstacle, 4 robot, 5 none
 ```
 
 Without `--sorting`, the PPO input remains seven navigation values. There is
@@ -333,7 +333,9 @@ Each episode has one robot and one visible waste item. Robot specialization
 and waste material are independently sampled as plastic or paper. Positions,
 the random go delay and the two XY motor actions follow the original task.
 Robot and waste centers start at least 3 m apart, outside initial ray detection.
-The paper object replaces the bottle in paper episodes. There are no static
+The cardboard shipping box replaces the bottle in cardboard episodes. It has
+separate walls, folded lid panels, packing tape, handling arrows and a shipping
+label with a barcode. There are no static
 obstacles or second robot in this training mode.
 
 The float32 policy observation reserves three materials and contains 76 values:
@@ -341,12 +343,12 @@ The float32 policy observation reserves three materials and contains 76 values:
 | Indices | Meaning |
 |---|---|
 | 0:7 | Original navigation observation, including go |
-| 7:10 | Robot specialization: plastic/cardboard/material_c one-hot |
+| 7:10 | Robot specialization: plastic/cardboard/residual one-hot |
 | 10:13 | Material previously detected: three bits, all zero if unknown |
-| 13:76 | Nine rays: [distance/2, plastic, cardboard, material_c, obstacle, robot, none] |
+| 13:76 | Nine rays: [distance/2, plastic, cardboard, residual, obstacle, robot, none] |
 
 Single- and two-robot sorting sample plastic and cardboard. `--three-robots`
-also samples `material_c`, using the third slot already present in the observation.
+also samples residual waste, using the third slot already present in the observation.
 No third waste object or robot has been added. To activate it later, add its
 scene geometry, map its ray category to 2, and enable it in the spawn sampling.
 The policy observation will stay at 76 values, but the policy will still need
@@ -368,7 +370,7 @@ Reporting is a programmed communication rule, not an additional learned action.
 
 In sorting mode `info["shared_comm"]` contains
 `[found, target_x/5, target_y/5, material]`, with material 0 unknown, 1 plastic,
-2 cardboard, 3 material_c. It is zero until an incompatible item is reported, and resets each
+2 cardboard, 3 residual waste. It is zero until an incompatible item is reported, and resets each
 episode. Step info also exposes `specialization`, `target_type`, `collected`,
 `reported`, `wrong_target` and `is_success`. Success rate combines successful
 collections and reports. The drone policy is inactive unless `--drone-model` is supplied.
@@ -392,7 +394,7 @@ into one `predict` call. Each receives its own 76-value observation and XY actio
 A single-robot sorting checkpoint trained with 76 inputs can be used directly.
 
 The yellow `robot` always specializes in plastic, and the blue `robot_2` in
-cardboard. Cardboard uses the existing paper geometry (material index 1), named
+cardboard. Cardboard uses the shipping box geometry (material index 1), named
 `cardboard` in info. Single- and two-robot modes have the same policy input layout.
 Single-robot training still randomizes the specialization. There is still one
 randomly typed waste item, at least 3 m from both robots. Only the closest robot
@@ -498,9 +500,12 @@ Only the shared robot policy is updated; the loaded drone policy stays frozen.
 ## Three sorting robots
 
 Use `--sorting --three-robots` to add the green `robot_3`, specialized in
-`material_c` (material index 2). The yellow robot collects plastic and the blue
-robot collects cardboard. `material_c` is represented by a short grey cylinder;
-the name keeps the third category already defined in the policy input.
+residual waste (`residual`, material index 2). The yellow robot collects plastic
+and the blue robot collects cardboard. Residual waste is represented by a dark
+tied rubbish bag with an irregular, folded mesh, a knot and loose plastic ends.
+All waste geometries are non-colliding and belong to their material's body, so
+robot and drone rays recognize the walls, tape, bag and knot as parts of the
+same item. The observation layout and material indices remain unchanged.
 `--two-robots` and `--three-robots` are mutually exclusive.
 
 There is one waste item per episode, sampled from all three materials, at least
@@ -512,8 +517,9 @@ reporter and the unassigned teammate. Wrong-material collection still fails
 the episode. Proximity and contact penalties include both other robots.
 
 All three robots share one PPO policy and keep the same 76-value input. A
-sorting checkpoint can therefore initialize training, but the third material,
-specialization and additional teammate require further training and evaluation.
+sorting checkpoint can be evaluated directly with the third material,
+specialization and additional teammate; the results determine whether further
+training is needed.
 The existing two-robot results do not measure performance with three robots.
 
 Continue from the two-robot checkpoint in a new run:
@@ -540,4 +546,4 @@ This command loads the existing two-robot policy to inspect its initial behavior
 after training, select the new run with `--model`. Omit `--drone-model` to use a
 known target position. With the drone, all three robots wait for discovery; the
 drone recognizes every material as generic waste and then stops. The robot that
-identifies `material_c` broadcasts material code 3, enabling a handoff to `robot_3`.
+identifies residual waste broadcasts material code 3, enabling a handoff to `robot_3`.

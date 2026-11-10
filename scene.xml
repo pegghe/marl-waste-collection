@@ -6,6 +6,12 @@
   <asset>
     <texture name="sky" type="skybox" builtin="flat" rgb1="0.45 0.72 0.95" rgb2="0.45 0.72 0.95" width="512" height="3072"/>
     <material name="grass" rgba="0.18 0.38 0.12 1" emission="1" specular="0" reflectance="0"/>
+    <material name="cardboard_outer" rgba="0.66 0.43 0.23 1" specular="0.05" shininess="0.05"/>
+    <material name="cardboard_inner" rgba="0.48 0.30 0.15 1" specular="0.02" shininess="0.02"/>
+    <material name="cardboard_edge" rgba="0.78 0.57 0.34 1" specular="0.03" shininess="0.03"/>
+    <material name="packing_tape" rgba="0.76 0.55 0.30 1" specular="0.35" shininess="0.25"/>
+    <material name="bag_plastic" rgba="0.055 0.065 0.075 1" specular="0.45" shininess="0.35"/>
+    <mesh name="residual_bag" file="assets/residual_bag.obj"/>
   </asset>
   <worldbody>
     <light pos="0 0 5" dir="0 0 -1" directional="true"/>
@@ -75,11 +81,46 @@
       <geom type="cylinder" pos="0 0 -0.025" size="0.092 0.065" rgba="1 0.25 0.03 1" contype="0" conaffinity="0"/>
     </body>
     <body name="paper" pos="1 1 0.065">
-      <geom type="box" size="0.14 0.10 0.06" rgba="0.88 0.82 0.68 1" contype="0" conaffinity="0"/>
+      <!-- Corrugated shipping box: separate walls, folded lid, tape and printed label. -->
+      <geom name="box_bottom" type="box" pos="0 0 -0.058" size="0.14 0.10 0.002" material="cardboard_inner" contype="0" conaffinity="0"/>
+      <geom name="box_left_wall" type="box" pos="-0.138 0 0" size="0.002 0.10 0.06" material="cardboard_outer" contype="0" conaffinity="0"/>
+      <geom name="box_right_wall" type="box" pos="0.138 0 0" size="0.002 0.10 0.06" material="cardboard_outer" contype="0" conaffinity="0"/>
+      <geom name="box_front_wall" type="box" pos="0 -0.098 0" size="0.136 0.002 0.06" material="cardboard_outer" contype="0" conaffinity="0"/>
+      <geom name="box_back_wall" type="box" pos="0 0.098 0" size="0.136 0.002 0.06" material="cardboard_outer" contype="0" conaffinity="0"/>
+      <geom name="box_lid_seam" type="box" pos="0 0 0.058" size="0.138 0.003 0.001" material="cardboard_inner" contype="0" conaffinity="0"/>
+      <geom name="box_front_flap" type="box" pos="0 -0.0505 0.06" size="0.138 0.0485 0.0015" material="cardboard_edge" contype="0" conaffinity="0"/>
+      <geom name="box_back_flap" type="box" pos="0 0.0505 0.06" size="0.138 0.0485 0.0015" material="cardboard_outer" contype="0" conaffinity="0"/>
+      <geom name="box_tape_top" type="box" pos="0 0 0.062" size="0.14 0.017 0.0005" material="packing_tape" contype="0" conaffinity="0"/>
+      <geom name="box_tape_left" type="box" pos="-0.1405 0 0.038" size="0.0005 0.017 0.024" material="packing_tape" contype="0" conaffinity="0"/>
+      <geom name="box_tape_right" type="box" pos="0.1405 0 0.038" size="0.0005 0.017 0.024" material="packing_tape" contype="0" conaffinity="0"/>
+      <geom name="box_label" type="box" pos="0.045 0.057 0.062" size="0.046 0.027 0.0005" rgba="0.92 0.90 0.82 1" contype="0" conaffinity="0"/>
+      <geom name="box_address_1" type="box" pos="0.035 0.074 0.0627" size="0.028 0.001 0.0002" rgba="0.22 0.20 0.17 1" contype="0" conaffinity="0"/>
+      <geom name="box_address_2" type="box" pos="0.026 0.069 0.0627" size="0.019 0.0008 0.0002" rgba="0.22 0.20 0.17 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_1" type="box" pos="0.013 0.048 0.0627" size="0.001 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_2" type="box" pos="0.019 0.048 0.0627" size="0.002 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_3" type="box" pos="0.025 0.048 0.0627" size="0.0007 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_4" type="box" pos="0.031 0.048 0.0627" size="0.0014 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_5" type="box" pos="0.038 0.048 0.0627" size="0.002 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_6" type="box" pos="0.044 0.048 0.0627" size="0.0008 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_7" type="box" pos="0.051 0.048 0.0627" size="0.0015 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_8" type="box" pos="0.057 0.048 0.0627" size="0.0007 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_9" type="box" pos="0.064 0.048 0.0627" size="0.002 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <geom name="box_barcode_10" type="box" pos="0.072 0.048 0.0627" size="0.001 0.010 0.0002" rgba="0.15 0.14 0.12 1" contype="0" conaffinity="0"/>
+      <!-- Two printed handling arrows on the front face. -->
+      <geom name="box_arrow_1_stem" type="box" pos="-0.087 -0.1005 0.010" size="0.0015 0.0005 0.017" rgba="0.25 0.17 0.10 1" contype="0" conaffinity="0"/>
+      <geom name="box_arrow_1_left" type="box" pos="-0.091 -0.1005 0.024" quat="0.9238795 0 0.3826834 0" size="0.0015 0.0005 0.007" rgba="0.25 0.17 0.10 1" contype="0" conaffinity="0"/>
+      <geom name="box_arrow_1_right" type="box" pos="-0.083 -0.1005 0.024" quat="0.9238795 0 -0.3826834 0" size="0.0015 0.0005 0.007" rgba="0.25 0.17 0.10 1" contype="0" conaffinity="0"/>
+      <geom name="box_arrow_2_stem" type="box" pos="-0.059 -0.1005 0.010" size="0.0015 0.0005 0.017" rgba="0.25 0.17 0.10 1" contype="0" conaffinity="0"/>
+      <geom name="box_arrow_2_left" type="box" pos="-0.063 -0.1005 0.024" quat="0.9238795 0 0.3826834 0" size="0.0015 0.0005 0.007" rgba="0.25 0.17 0.10 1" contype="0" conaffinity="0"/>
+      <geom name="box_arrow_2_right" type="box" pos="-0.055 -0.1005 0.024" quat="0.9238795 0 -0.3826834 0" size="0.0015 0.0005 0.007" rgba="0.25 0.17 0.10 1" contype="0" conaffinity="0"/>
     </body>
     <body name="material_c" pos="1 1 0.085">
-      <!-- Third waste category; enabled with the three-specialist team. -->
-      <geom type="cylinder" size="0.10 0.08" rgba="0.65 0.70 0.75 1" contype="0" conaffinity="0"/>
+      <!-- Residual waste: an irregular dark bag, gathered and tied at the top. -->
+      <geom name="residual_bag_body" type="mesh" mesh="residual_bag" material="bag_plastic" contype="0" conaffinity="0"/>
+      <geom name="residual_bag_knot" type="ellipsoid" pos="0.008 -0.004 0.080" size="0.024 0.018 0.014" quat="0.9659258 0 0 0.2588190" material="bag_plastic" contype="0" conaffinity="0"/>
+      <geom name="residual_bag_tie" type="capsule" fromto="-0.012 -0.018 0.080 0.025 0.013 0.084" size="0.003" rgba="0.37 0.38 0.33 1" contype="0" conaffinity="0"/>
+      <geom name="residual_bag_tail_left" type="ellipsoid" pos="-0.009 -0.001 0.103" size="0.021 0.006 0.027" quat="0.9396926 0 -0.3420201 0" material="bag_plastic" contype="0" conaffinity="0"/>
+      <geom name="residual_bag_tail_right" type="ellipsoid" pos="0.025 0.003 0.100" size="0.018 0.005 0.025" quat="0.9238795 0 0.3826834 0" material="bag_plastic" contype="0" conaffinity="0"/>
     </body>
     <body name="drone" mocap="true" pos="0 0 3">
       <geom type="box" size="0.09 0.09 0.035" rgba="0.02 0.02 0.02 1" contype="0" conaffinity="0"/>
