@@ -20,11 +20,22 @@ class WasteCollectionEnv(MujocoEnv):
     }
 
     def __init__(self, render_mode=None, drone_training=False, finish_on_discovery=None,
-                 two_robots=False, sorting=False, drone_search=False):
+                 two_robots=False, sorting=False, drone_search=False, three_robots=False):
         if sorting and drone_training:
             raise ValueError("Sorting mode does not use a drone policy")
+        if two_robots and three_robots:
+            raise ValueError("Choose either two or three robots")
+        if three_robots and not sorting:
+            raise ValueError("Three robots require sorting mode")
         self.sorting = sorting
         self.two_robots = two_robots
+        self.three_robots = three_robots
+        self.robot_count = 3 if three_robots else (2 if two_robots else 1)
+        self.multi_robot = self.robot_count > 1
+        self.robot_names = ("robot", "robot_2", "robot_3")[:self.robot_count]
+        self.material_bodies = ("target", "paper", "material_c")[:
+            3 if three_robots else (2 if sorting else 1)
+        ]
         self.drone_training = drone_training
         self.drone_active = drone_training or drone_search
         self.finish_on_discovery = drone_training if finish_on_discovery is None else finish_on_discovery
@@ -48,44 +59,48 @@ class WasteCollectionEnv(MujocoEnv):
         self.team_bonus = 10.0
         self.robot = RobotAgent(self)
         self.robots = {"robot": self.robot}
-        if two_robots:
-            self.robots["robot_2"] = RobotAgent(self, "robot_2")
+        for name in self.robot_names[1:]:
+            self.robots[name] = RobotAgent(self, name)
         self.drone = DroneAgent(self)
         # Three material slots, then obstacle, other robot and no hit.
         self.ray_geom_types = np.full(self.model.ngeom, RobotAgent.material_count, dtype=np.int32)
-        self.ray_geom_types[np.isin(self.model.geom_group, [1, 2])] = RobotAgent.material_count + 1
-        self.ray_geom_types[self.model.geom_bodyid == self.model.body("target").id] = 0
-        if sorting:
-            self.ray_geom_types[self.model.geom_bodyid == self.model.body("paper").id] = 1
+        robot_groups = [robot.geom_group for robot in self.robots.values()]
+        self.ray_geom_types[np.isin(self.model.geom_group, robot_groups)] = RobotAgent.material_count + 1
+        for kind, body in enumerate(self.material_bodies):
+            self.ray_geom_types[self.model.geom_bodyid == self.model.body(body).id] = kind
         self.drone_action_space = self.drone.action_space
         self.drone_observation_space = self.drone.observation_space
 
     def _initialize_simulation(self):
-        """Build the second robot from the same shell, joints and sensor definition."""
+        """Build each specialist from the same shell, joints and sensor definition."""
         scene = ET.parse(self.fullpath).getroot()
         world = scene.find("worldbody")
-        if not self.sorting:
-            world.remove(world.find("body[@name='paper']"))
+        for body in ("paper", "material_c"):
+            if body not in self.material_bodies:
+                world.remove(world.find(f"body[@name='{body}']"))
         robot = world.find("body[@name='robot']")
         for geom in robot.iter("geom"):
             geom.set("group", "1")
         world.find("geom[@name='floor']").set("group", "3")
-        if self.two_robots:
-            second = deepcopy(robot)
-            for element in second.iter():
+        actuators = scene.find("actuator")
+        original_motors = list(actuators)
+        for name, group, color in zip(
+            self.robot_names[1:], (2, 4), ("0.10 0.55 0.95 1", "0.15 0.80 0.30 1"),
+        ):
+            duplicate_robot = deepcopy(robot)
+            for element in duplicate_robot.iter():
                 if "name" in element.attrib:
-                    name = element.get("name")
-                    element.set("name", "robot_2" if name == "robot" else "robot_2_" + name)
+                    original_name = element.get("name")
+                    element.set("name", name if original_name == "robot" else name + "_" + original_name)
                 if element.tag == "geom":
-                    element.set("group", "2")
+                    element.set("group", str(group))
                     if element.get("rgba") == "0.96 0.70 0.04 1":
-                        element.set("rgba", "0.10 0.55 0.95 1")
-            world.append(second)
-            actuators = scene.find("actuator")
-            for motor in list(actuators):
+                        element.set("rgba", color)
+            world.append(duplicate_robot)
+            for motor in original_motors:
                 duplicate = deepcopy(motor)
-                duplicate.set("name", "robot_2_" + motor.get("name"))
-                duplicate.set("joint", "robot_2_" + motor.get("joint"))
+                duplicate.set("name", name + "_" + motor.get("name"))
+                duplicate.set("joint", name + "_" + motor.get("joint"))
                 actuators.append(duplicate)
         model = mujoco.MjModel.from_xml_string(ET.tostring(scene, encoding="unicode"))
         model.vis.global_.offwidth = self.width
@@ -106,7 +121,7 @@ class WasteCollectionEnv(MujocoEnv):
         info["robot_sensors"] = self.get_robot_sensors()
         if self.sorting:
             info["shared_comm"] = self.shared_comm.copy()
-            if self.two_robots:
+            if self.multi_robot:
                 info["active_robot"] = self.active_robot
             info["robot_specializations"] = {
                 name: RobotAgent.ray_categories[robot.specialization]
@@ -127,12 +142,12 @@ class WasteCollectionEnv(MujocoEnv):
 
     def render(self):
         viewer = self.mujoco_renderer._get_viewer(self.render_mode)
-        # Group 3 is hidden by default in MuJoCo; here it contains the floor.
+        # Groups 3 and 4 contain the floor and the third robot.
         viewer.vopt.geomgroup[3] = 1
+        viewer.vopt.geomgroup[4] = 1
         self.drone.render_rays(viewer)
         for robot in self.robots.values():
             robot.update_rays()
-            robot.render_rays(viewer)
         # Pose only the rendered frame, leaving sensing and physics in their base pose.
         try:
             for robot in self.robots.values():
@@ -151,18 +166,18 @@ class WasteCollectionEnv(MujocoEnv):
         self.steps = 0
         self.team_reward_given = False
         qpos = self.robot.reset()
-        if self.two_robots:
-            qpos = self.robots["robot_2"].reset(qpos)
-        self.target_type = int(self.np_random.integers(2)) if self.sorting else 0
+        for name in self.robot_names[1:]:
+            qpos = self.robots[name].reset(qpos)
+        self.target_type = int(self.np_random.integers(len(self.material_bodies))) if self.sorting else 0
         if self.sorting:
-            for kind, body in enumerate(("target", "paper")):
+            for kind, body in enumerate(self.material_bodies):
                 self.model.body(body).pos[:2] = self.target if kind == self.target_type else [20, 20]
         else:
             self.model.body("target").pos[:2] = self.target
         self.drone.reset_position(randomize=self.drone_active)
         self.set_state(qpos, self.init_qvel.copy())
         self.shared_comm = np.zeros(4 if self.sorting else 3, dtype=np.float32)
-        if self.sorting and self.two_robots:
+        if self.sorting and self.multi_robot:
             self.assign_robot()
         self.drone.reset()
         for robot in self.robots.values():
@@ -199,7 +214,7 @@ class WasteCollectionEnv(MujocoEnv):
         stationary = {}
         for robot in self.robots.values():
             controls[robot.actuator_ids] = robot.control(action[robot.actuator_ids])
-            if self.sorting and self.two_robots and robot.name != self.active_robot:
+            if self.sorting and self.multi_robot and robot.name != self.active_robot:
                 stationary[robot.name] = robot.position.copy()
                 self.data.qvel[robot.qvel_indices] = 0
         self.do_simulation(controls, self.frame_skip)
@@ -255,9 +270,9 @@ class WasteCollectionEnv(MujocoEnv):
                 robot.completed and robot.specialization == self.target_type
                 for robot in self.robots.values()
             )
-            success = (collected if self.two_robots else success) and not wrong_target
+            success = (collected if self.multi_robot else success) and not wrong_target
             terminated = success or wrong_target
-            if self.two_robots:
+            if self.multi_robot:
                 if terminated:
                     self.active_robot = None
                     for robot in self.robots.values():
@@ -282,7 +297,7 @@ class WasteCollectionEnv(MujocoEnv):
             )
         truncated = self.steps >= self.max_steps and not terminated
         team_reward = 0.0
-        if self.sorting and self.two_robots and success and not self.team_reward_given:
+        if self.sorting and self.multi_robot and success and not self.team_reward_given:
             team_reward = self.team_bonus
             self.team_reward_given = True
         info["team_reward"] = team_reward
@@ -296,7 +311,7 @@ class WasteCollectionEnv(MujocoEnv):
 
 class RobotMAEnv(BaseMAEnv):
     def __init__(self, render_mode=None, drone_training=False, finish_on_discovery=None,
-                 two_robots=False, sorting=False, drone_search=False):
+                 two_robots=False, sorting=False, drone_search=False, three_robots=False):
         super().__init__()
         self.drone_training = drone_training
         self.episode_successes = []
@@ -304,6 +319,7 @@ class RobotMAEnv(BaseMAEnv):
             render_mode=render_mode, drone_training=drone_training,
             finish_on_discovery=finish_on_discovery,
             two_robots=two_robots,
+            three_robots=three_robots,
             sorting=sorting,
             drone_search=drone_search,
         )

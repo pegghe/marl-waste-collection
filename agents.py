@@ -22,6 +22,7 @@ class RobotAgent:
         self.name = name
         prefix = "" if name == "robot" else f"{name}_"
         self.body_id = env.model.body(name).id
+        self.geom_group = int(env.model.geom_group[env.model.body_geomadr[self.body_id]])
         self.visual_body_id = env.model.body(prefix + "robot_visual").id
         self.sensor_id = env.model.body(prefix + "robot_head_sensor").id
         self.leg_body_ids = np.array([
@@ -44,9 +45,9 @@ class RobotAgent:
         self.observation_space = env.observation_space
         self.action_space = spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
         self.ray_length = 2.0
-        # Ignore this robot (group 1 or 2) and the floor (group 3).
+        # Each robot has its own geometry group; group 3 is the floor.
         geomgroup = np.ones(6, dtype=np.uint8)
-        geomgroup[1 if name == "robot" else 2] = 0
+        geomgroup[self.geom_group] = 0
         geomgroup[3] = 0
         self.raycaster = Raycaster(
             env.model, env.data, {self.body_id: self.sensor_id}, geomgroup=geomgroup,
@@ -82,8 +83,8 @@ class RobotAgent:
         self.go = 0 if env.drone_active else int(self.go_delay == 0)
         self.completed = False
         self.specialization = int(env.np_random.integers(2)) if env.sorting else 0
-        if env.sorting and env.two_robots:
-            self.specialization = int(self.name == "robot_2")
+        if env.sorting and env.multi_robot:
+            self.specialization = env.robot_names.index(self.name)
         self.detected_type = -1
         if qpos is None:
             qpos = env.init_qpos.copy()
@@ -93,8 +94,10 @@ class RobotAgent:
             while np.linalg.norm(env.target - position) < env.min_spawn_distance:
                 env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
         else:
-            # Keep the second shell clear of the first robot and the bottle.
-            while (np.linalg.norm(position - qpos[env.robot.qpos_indices]) < 1.0
+            # Keep every shell clear of all robots placed earlier and the waste.
+            previous = env.robot_names[:env.robot_names.index(self.name)]
+            while (any(np.linalg.norm(position - qpos[env.robots[name].qpos_indices]) < 1.0
+                       for name in previous)
                    or np.linalg.norm(position - env.target) < env.min_spawn_distance):
                 position = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
         qpos[self.qpos_indices] = position
@@ -103,7 +106,7 @@ class RobotAgent:
         return qpos
 
     def control(self, action):
-        if self.env.sorting and self.env.two_robots and self.name != self.env.active_robot:
+        if self.env.sorting and self.env.multi_robot and self.name != self.env.active_robot:
             return np.zeros(2)
         # As in the thesis, ground-agent actions stay zero until detection.
         if self.env.drone_active and not self.env.shared_comm[0]:
@@ -179,7 +182,7 @@ class RobotAgent:
     def get_observation(self):
         # The robot only receives the target broadcast after drone detection.
         if self.env.drone_active:
-            if not (self.env.sorting and self.env.two_robots):
+            if not (self.env.sorting and self.env.multi_robot):
                 self.go = int(bool(self.env.shared_comm[0]))
             relative_target = (
                 self.env.shared_comm[1:3] * self.env.drone.area_half_size - self.position
@@ -222,36 +225,37 @@ class RobotAgent:
             if not compatible and distance <= self.success_radius:
                 # Entering the collection radius of the wrong waste is a failure.
                 return float(reward - 10), False, distance
-            if self.env.two_robots and self.name != self.env.active_robot:
+            if self.env.multi_robot and self.name != self.env.active_robot:
                 return 0.0, False, distance
             self.avoidance_reward = self.compute_avoidance_reward()
             reward += self.avoidance_reward
             success = bool(self.go and identified and (not compatible or distance <= self.success_radius))
             if success and not compatible:
-                # Material: 0 unknown, 1 plastic, 2 cardboard, 3 reserved.
+                # Material: 0 unknown, 1 plastic, 2 cardboard, 3 material_c.
                 self.env.shared_comm[:] = [1, *self.env.target / 5, self.detected_type + 1]
         if success:
             reward += 10
             self.completed = True
 
         # The next action receives go=1 once the waiting period is over.
-        if not self.env.drone_active and not (self.env.sorting and self.env.two_robots):
+        if not self.env.drone_active and not (self.env.sorting and self.env.multi_robot):
             self.go = int(self.env.steps >= self.go_delay)
         return float(reward), success, distance
 
     def compute_avoidance_reward(self):
         """Train clearance without replacing the policy's movement commands."""
-        if not self.go or not self.env.two_robots:
+        if not self.go or not self.env.multi_robot:
             return 0.0
         others = [robot for robot in self.env.robots.values() if robot is not self]
         distance = min(np.linalg.norm(self.position - robot.position) for robot in others)
         proximity = max(0.0, 1.0 - distance / self.robot_safe_distance)
         # Physics contacts, rather than semantic rays, establish actual collision.
-        own_group = 1 if self.name == "robot" else 2
-        other_group = 3 - own_group
+        other_groups = {robot.geom_group for robot in others}
         collision = any(
-            {int(self.env.model.geom_group[c.geom1]), int(self.env.model.geom_group[c.geom2])}
-            == {own_group, other_group}
+            (int(self.env.model.geom_group[c.geom1]) == self.geom_group
+             and int(self.env.model.geom_group[c.geom2]) in other_groups)
+            or (int(self.env.model.geom_group[c.geom2]) == self.geom_group
+                and int(self.env.model.geom_group[c.geom1]) in other_groups)
             for c in self.env.data.contact
         )
         return float(-self.robot_proximity_weight * proximity
@@ -278,7 +282,8 @@ class RobotAgent:
         return observation
 
     def render_rays(self, viewer):
-        color = (1.0, 0.8, 0.05, 1.0) if self.name == "robot" else (0.1, 0.75, 1.0, 1.0)
+        colors = ((1.0, 0.8, 0.05, 1.0), (0.1, 0.75, 1.0, 1.0), (0.15, 0.9, 0.3, 1.0))
+        color = colors[self.env.robot_names.index(self.name)]
         self.raycaster.render_rays(self.body_id, self.ray_length, viewer, color)
 
 
@@ -311,8 +316,7 @@ class DroneAgent:
         self.blocked_fraction = 0.0
         self.last_movement = 0.0
         self.debug_actions = False
-        target_bodies = ("target", "paper") if env.sorting else ("target",)
-        target_body_ids = [env.model.body(name).id for name in target_bodies]
+        target_body_ids = [env.model.body(name).id for name in env.material_bodies]
         self.target_geom_ids = np.flatnonzero(np.isin(env.model.geom_bodyid, target_body_ids))
         self.cell_size = 0.5
         # Rows follow world Y and columns follow world X, starting at the lower bounds.

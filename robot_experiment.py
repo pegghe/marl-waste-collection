@@ -14,6 +14,7 @@ from masb3.utils import ma_evaluate, ma_train
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.vec_env import VecMonitor, VecNormalize
 
+from agents import RobotAgent
 from waste_collection_env import RobotMAEnv
 
 
@@ -125,7 +126,7 @@ class RobotExperiment:
         return checkpoint
 
     def train(self, agent="robot", steps=600_000, resume=False, model=None, two_robots=False,
-              drone_model=None):
+              drone_model=None, three_robots=False):
         if steps < 1:
             raise ValueError("steps must be positive")
         if model is not None and not resume:
@@ -147,20 +148,24 @@ class RobotExperiment:
                 run_number += 1
         self.last_run_directory = output
         robot_env = RobotMAEnv(drone_training=agent == "drone", sorting=self.sorting,
-                               two_robots=two_robots, drone_search=drone_checkpoint is not None)
+                               two_robots=two_robots, three_robots=three_robots,
+                               drone_search=drone_checkpoint is not None)
         drone = robot_env.env.drone
         (output / "config.json").write_text(json.dumps({
             "agent": agent, "requested_steps": steps,
             "sorting": self.sorting,
             "two_robots": two_robots,
+            "three_robots": three_robots,
+            "robot_count": robot_env.env.robot_count,
+            "materials": list(RobotAgent.ray_categories[:len(robot_env.env.material_bodies)]),
             "drone_model": str(drone_checkpoint.resolve()) if drone_checkpoint else None,
-            "team_bonus": robot_env.env.team_bonus if self.sorting and two_robots else 0,
+            "team_bonus": robot_env.env.team_bonus if self.sorting and robot_env.env.multi_robot else 0,
             "robot_observation_size": robot_env.env.observation_space.shape[0],
             "robot_avoidance": {
                 "safe_distance": robot_env.env.robot.robot_safe_distance,
                 "proximity_weight": robot_env.env.robot.robot_proximity_weight,
                 "collision_penalty": robot_env.env.robot.robot_collision_penalty,
-            } if self.sorting and two_robots else None,
+            } if self.sorting and robot_env.env.multi_robot else None,
             "resume_from": str(checkpoint.resolve()) if checkpoint else None,
             "robot_model": str(Path(self.model_path).resolve()) if agent == "drone" else None,
             "drone_search": {
@@ -224,7 +229,7 @@ class RobotExperiment:
             env.close()
 
     def evaluate(self, episodes=10, render=False, agent="robot", best=False, model=None,
-                 debug_actions=False, two_robots=False, drone_model=None):
+                 debug_actions=False, two_robots=False, drone_model=None, three_robots=False):
         checkpoint = self.resolve_model(agent, model, best)
         print(f"Evaluating: {checkpoint}")
         robot_path = checkpoint if agent == "robot" else self.model_path
@@ -239,6 +244,7 @@ class RobotExperiment:
             render_mode="human" if render else None, drone_training=agent == "drone",
             finish_on_discovery=False,
             two_robots=two_robots,
+            three_robots=three_robots,
             sorting=self.sorting,
             drone_search=drone_model is not None,
         )
@@ -269,10 +275,13 @@ if __name__ == "__main__":
     parser.add_argument("--best", action="store_true",
                         help="Evaluate the selected agent's best_model instead of final_model")
     parser.add_argument("--render", action="store_true")
-    parser.add_argument("--two-robots", action="store_true",
-                        help="Train/evaluate two robots sharing the same PPO policy")
+    team = parser.add_mutually_exclusive_group()
+    team.add_argument("--two-robots", action="store_true",
+                      help="Train/evaluate two robots sharing the same PPO policy")
+    team.add_argument("--three-robots", action="store_true",
+                      help="Train/evaluate plastic/cardboard/material_c specialists with --sorting")
     parser.add_argument("--sorting", action="store_true",
-                        help="Train/evaluate plastic/cardboard specialists with semantic rays")
+                        help="Train/evaluate material specialists with semantic rays")
     parser.add_argument("--drone-model", type=Path,
                         help="Use a frozen drone checkpoint to locate waste before dispatching sorting robots")
     parser.add_argument("--debug-actions", action="store_true",
@@ -283,6 +292,8 @@ if __name__ == "__main__":
         parser.error("--debug-actions requires evaluate --agent drone")
     if args.sorting and args.agent != "robot":
         parser.error("--sorting requires --agent robot")
+    if args.three_robots and not args.sorting:
+        parser.error("--three-robots requires --sorting")
     if args.drone_model is not None and (not args.sorting or args.agent != "robot"):
         parser.error("--drone-model requires --sorting --agent robot")
 
@@ -293,9 +304,11 @@ if __name__ == "__main__":
     experiment = RobotExperiment(sorting=args.sorting)
     if args.mode == "train":
         experiment.train(agent=args.agent, steps=args.steps, resume=args.resume, model=args.model,
-                         two_robots=args.two_robots, drone_model=args.drone_model)
+                         two_robots=args.two_robots, drone_model=args.drone_model,
+                         three_robots=args.three_robots)
     else:
         experiment.evaluate(episodes=args.episodes, render=args.render, agent=args.agent,
                             best=args.best, model=args.model, debug_actions=args.debug_actions,
-                            two_robots=args.two_robots, drone_model=args.drone_model)
+                            two_robots=args.two_robots, drone_model=args.drone_model,
+                            three_robots=args.three_robots)
 

@@ -345,7 +345,8 @@ The float32 policy observation reserves three materials and contains 76 values:
 | 10:13 | Material previously detected: three bits, all zero if unknown |
 | 13:76 | Nine rays: [distance/2, plastic, cardboard, material_c, obstacle, robot, none] |
 
-`material_c` is reserved: episodes still sample only plastic and cardboard.
+Single- and two-robot sorting sample plastic and cardboard. `--three-robots`
+also samples `material_c`, using the third slot already present in the observation.
 No third waste object or robot has been added. To activate it later, add its
 scene geometry, map its ray category to 2, and enable it in the spawn sampling.
 The policy observation will stay at 76 values, but the policy will still need
@@ -367,7 +368,7 @@ Reporting is a programmed communication rule, not an additional learned action.
 
 In sorting mode `info["shared_comm"]` contains
 `[found, target_x/5, target_y/5, material]`, with material 0 unknown, 1 plastic,
-2 cardboard, 3 reserved. It is zero until an incompatible item is reported, and resets each
+2 cardboard, 3 material_c. It is zero until an incompatible item is reported, and resets each
 episode. Step info also exposes `specialization`, `target_type`, `collected`,
 `reported`, `wrong_target` and `is_success`. Success rate combines successful
 collections and reports. The drone policy is inactive unless `--drone-model` is supplied.
@@ -376,7 +377,7 @@ Models are saved separately under `models/ppo_sorting/runs/`, and TensorBoard
 names include `sorting`. Start a new model: the old seven-input and 65-input
 checkpoints cannot be resumed directly with the 76-input observation. Subsequent sorting runs can
 use the existing `--resume`, `--model` and `--best` options. Training uses one
-robot unless `--two-robots` is set; legacy modes remain selectable without `--sorting`.
+robot unless `--two-robots` or `--three-robots` is set; legacy modes remain selectable without `--sorting`.
 
 ## Two sorting robots with the shared PPO policy
 
@@ -434,7 +435,7 @@ Each robot receives its individual reward plus a team component:
   a wrong-radius violation. This includes a robot that already reported and
   stopped. Reports alone, failures and timeouts earn no team bonus.
 
-The team bonus is paid once per episode and applies only to two-robot sorting.
+The team bonus is paid once per episode and applies to two- and three-robot sorting.
 It is set by `WasteCollectionEnv.team_bonus`. Step info exposes
 `individual_rewards`, the shared scalar `team_reward`, and combined
 `robot_rewards`, which are the values consumed by MASB3 and PPO. Config files
@@ -493,3 +494,50 @@ pay the robot team bonus: compatible collection is still required.
 The same `--drone-model` option can be used with `train --sorting --two-robots`.
 Only the shared robot policy is updated; the loaded drone policy stays frozen.
 `--agent drone` remains the separate legacy drone-training mode.
+
+## Three sorting robots
+
+Use `--sorting --three-robots` to add the green `robot_3`, specialized in
+`material_c` (material index 2). The yellow robot collects plastic and the blue
+robot collects cardboard. `material_c` is represented by a short grey cylinder;
+the name keeps the third category already defined in the policy input.
+`--two-robots` and `--three-robots` are mutually exclusive.
+
+There is one waste item per episode, sampled from all three materials, at least
+3 m from every robot. Robot spawns are at least 1 m apart. The closest robot
+identifies the material and either collects it or passes the task directly to
+the compatible specialist. Only the assigned robot moves; both teammates wait.
+Correct collection gives all three robots the +10 team bonus, including the
+reporter and the unassigned teammate. Wrong-material collection still fails
+the episode. Proximity and contact penalties include both other robots.
+
+All three robots share one PPO policy and keep the same 76-value input. A
+sorting checkpoint can therefore initialize training, but the third material,
+specialization and additional teammate require further training and evaluation.
+The existing two-robot results do not measure performance with three robots.
+
+Continue from the two-robot checkpoint in a new run:
+
+```bash
+python robot_experiment.py train --sorting --three-robots --resume --steps 600000 \
+  --model models/ppo_sorting/runs/run_002/best_model.zip
+```
+
+For a new model, omit `--resume` and `--model`. With three learning robots,
+each world step supplies three transitions; a full PPO rollout supplies 6,144.
+The run's `config.json` records `robot_count`, the enabled materials and the
+source checkpoint.
+
+To evaluate a selected checkpoint with the drone:
+
+```bash
+python robot_experiment.py evaluate --sorting --three-robots --render --episodes 10 \
+  --model models/ppo_sorting/runs/run_002/best_model.zip \
+  --drone-model models/ppo_drone/runs/anti_oscillation_best/best_model.zip
+```
+
+This command loads the existing two-robot policy to inspect its initial behavior;
+after training, select the new run with `--model`. Omit `--drone-model` to use a
+known target position. With the drone, all three robots wait for discovery; the
+drone recognizes every material as generic waste and then stops. The robot that
+identifies `material_c` broadcasts material code 3, enabling a handoff to `robot_3`.
