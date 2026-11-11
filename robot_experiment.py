@@ -4,6 +4,7 @@ import argparse
 from collections import deque
 import json
 from pathlib import Path
+import random
 
 import numpy as np
 
@@ -126,13 +127,20 @@ class RobotExperiment:
         return checkpoint
 
     def train(self, agent="robot", steps=600_000, resume=False, model=None, two_robots=False,
-              drone_model=None, three_robots=False):
+              drone_model=None, three_robots=False, robots_per_team=None, waste_per_type=None,
+              seed=0, worldsteps=False):
         if steps < 1:
             raise ValueError("steps must be positive")
         if model is not None and not resume:
             raise ValueError("Use --resume with --model when training")
         checkpoint = self.resolve_model(agent, model) if resume else None
         drone_checkpoint = self.resolve_model("drone", drone_model) if drone_model is not None else None
+        robot_env = RobotMAEnv(drone_training=agent == "drone", sorting=self.sorting,
+                               two_robots=two_robots, three_robots=three_robots,
+                               robots_per_team=robots_per_team, waste_per_type=waste_per_type,
+                               drone_search=drone_checkpoint is not None)
+        learning_ids = list(robot_env.env.robots) if agent == "robot" else [agent]
+        learning_steps = steps * len(learning_ids) if worldsteps else steps
         runs_directory = self.model_directory(agent) / "runs"
         runs_directory.mkdir(parents=True, exist_ok=True)
         numbers = [int(path.name[4:]) for path in runs_directory.iterdir()
@@ -147,17 +155,22 @@ class RobotExperiment:
             except FileExistsError:
                 run_number += 1
         self.last_run_directory = output
-        robot_env = RobotMAEnv(drone_training=agent == "drone", sorting=self.sorting,
-                               two_robots=two_robots, three_robots=three_robots,
-                               drone_search=drone_checkpoint is not None)
         drone = robot_env.env.drone
         (output / "config.json").write_text(json.dumps({
             "agent": agent, "requested_steps": steps,
+            "step_unit": "world" if worldsteps else "learning",
+            "requested_learning_steps": learning_steps,
+            "learning_agents": len(learning_ids),
+            "seed": seed,
             "sorting": self.sorting,
             "two_robots": two_robots,
             "three_robots": three_robots,
             "robot_count": robot_env.env.robot_count,
-            "materials": list(RobotAgent.ray_categories[:len(robot_env.env.material_bodies)]),
+            "robots_per_team": robot_env.env.robots_per_team,
+            "waste_per_type": robot_env.env.waste_per_type,
+            "materials": [RobotAgent.ray_categories[kind] for kind in sorted(set(robot_env.env.material_types))],
+            "collection_mode": robot_env.env.collection_mode,
+            "assignment": "sequential_nearest" if robot_env.env.collection_mode else "single_target",
             "drone_model": str(drone_checkpoint.resolve()) if drone_checkpoint else None,
             "team_bonus": robot_env.env.team_bonus if self.sorting and robot_env.env.multi_robot else 0,
             "robot_observation_size": robot_env.env.observation_space.shape[0],
@@ -181,8 +194,7 @@ class RobotExperiment:
         if checkpoint:
             print(f"Resuming from: {checkpoint}")
         torch.set_num_threads(1)
-        robot_env.reset(seed=0)
-        learning_ids = list(robot_env.env.robots) if agent == "robot" else [agent]
+        robot_env.reset(seed=seed)
         env = SuccessVecEnv(robot_env, learning_agent_ids=learning_ids)
         env = VecMonitor(env)
         normalization_path = checkpoint.with_name(checkpoint.stem + "_vecnormalize.pkl") if checkpoint else None
@@ -194,7 +206,7 @@ class RobotExperiment:
         agent_env_map = {agent: env}
         algo = get_algo("sb3", "PPO")
         params = {
-            "policy": "MlpPolicy", "seed": 0, "device": "cpu", "verbose": 1,
+            "policy": "MlpPolicy", "seed": seed, "device": "cpu", "verbose": 1,
             "tensorboard_log": "./tensorboard_logs/",
             "learning_rate": 0.0003 if agent == "drone" else 0.0003,
         }
@@ -217,7 +229,7 @@ class RobotExperiment:
                 model_algo_map=model_algo_map,
                 models_to_train=[agent],
                 models_to_load=models_to_load,
-                total_timesteps_per_model=steps,
+                total_timesteps_per_model=learning_steps,
                 training_iterations=1,
                 tb_log_suffix=f"{agent}_{'sorting_' if self.sorting else ''}{run_id}",
             )
@@ -229,7 +241,9 @@ class RobotExperiment:
             env.close()
 
     def evaluate(self, episodes=10, render=False, agent="robot", best=False, model=None,
-                 debug_actions=False, two_robots=False, drone_model=None, three_robots=False):
+                 debug_actions=False, two_robots=False, drone_model=None, three_robots=False,
+                 robots_per_team=None, waste_per_type=None, seed=0):
+        torch.set_num_threads(1)
         checkpoint = self.resolve_model(agent, model, best)
         print(f"Evaluating: {checkpoint}")
         robot_path = checkpoint if agent == "robot" else self.model_path
@@ -247,9 +261,16 @@ class RobotExperiment:
             three_robots=three_robots,
             sorting=self.sorting,
             drone_search=drone_model is not None,
+            robots_per_team=robots_per_team,
+            waste_per_type=waste_per_type,
+            seed=seed,
         )
         env.env.drone.debug_actions = debug_actions
         env.set_agent_models(models)
+        # Loading an SB3 checkpoint restores its saved RNG seed; apply the requested seed afterwards.
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
         try:
             avg_agent, avg_model = ma_evaluate(
                 env, models, total_episodes=episodes, verbose=True,
@@ -258,6 +279,8 @@ class RobotExperiment:
             print(f"Average reward per model: {avg_model}")
             success_rate = sum(env.episode_successes) / len(env.episode_successes)
             print(f"success_rate: {success_rate:.2%}")
+            if env.env.collection_mode:
+                print(f"mean_collection_fraction: {np.mean(env.episode_collection_fractions):.2%}")
             return avg_agent, avg_model
         finally:
             env.close()
@@ -267,7 +290,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["train", "evaluate"])
     parser.add_argument("--agent", choices=["robot", "drone"], default="robot")
-    parser.add_argument("--steps", type=int, default=600_000)
+    parser.add_argument("--steps", type=int, default=600_000,
+                        help="Additional learning transitions, or world steps with --worldsteps")
+    parser.add_argument("--seed", type=int, default=0,
+                        help="Seed for training or reproducible stochastic evaluation")
+    parser.add_argument("--worldsteps", action="store_true",
+                        help="Interpret --steps as world steps instead of learning transitions")
     parser.add_argument("--resume", action="store_true",
                         help="Continue from --model or the latest completed run (legacy final_model if no runs exist)")
     parser.add_argument("--model", type=Path,
@@ -280,6 +308,11 @@ if __name__ == "__main__":
                       help="Train/evaluate two robots sharing the same PPO policy")
     team.add_argument("--three-robots", action="store_true",
                       help="Train/evaluate plastic/cardboard/residual-waste specialists with --sorting")
+    team.add_argument("--robots-per-team", nargs=3, type=int, metavar=("PLASTIC", "CARDBOARD", "RESIDUAL"),
+                      help="Number of robots for each material; enables configurable collection")
+    parser.add_argument("--waste-per-type", nargs=3, type=int,
+                        metavar=("PLASTIC", "CARDBOARD", "RESIDUAL"),
+                        help="Number of waste items of each material in one episode")
     parser.add_argument("--sorting", action="store_true",
                         help="Train/evaluate material specialists with semantic rays")
     parser.add_argument("--drone-model", type=Path,
@@ -294,6 +327,13 @@ if __name__ == "__main__":
         parser.error("--sorting requires --agent robot")
     if args.three_robots and not args.sorting:
         parser.error("--three-robots requires --sorting")
+    configurable = args.robots_per_team is not None or args.waste_per_type is not None
+    if configurable and not args.sorting:
+        parser.error("--robots-per-team and --waste-per-type require --sorting")
+    if configurable and args.drone_model is not None:
+        parser.error("Configurable collection uses known positions; omit --drone-model")
+    if args.worldsteps and args.mode != "train":
+        parser.error("--worldsteps is for training")
     if args.drone_model is not None and (not args.sorting or args.agent != "robot"):
         parser.error("--drone-model requires --sorting --agent robot")
 
@@ -305,10 +345,12 @@ if __name__ == "__main__":
     if args.mode == "train":
         experiment.train(agent=args.agent, steps=args.steps, resume=args.resume, model=args.model,
                          two_robots=args.two_robots, drone_model=args.drone_model,
-                         three_robots=args.three_robots)
+                         three_robots=args.three_robots, robots_per_team=args.robots_per_team,
+                         waste_per_type=args.waste_per_type, seed=args.seed, worldsteps=args.worldsteps)
     else:
         experiment.evaluate(episodes=args.episodes, render=args.render, agent=args.agent,
                             best=args.best, model=args.model, debug_actions=args.debug_actions,
                             two_robots=args.two_robots, drone_model=args.drone_model,
-                            three_robots=args.three_robots)
+                            three_robots=args.three_robots, robots_per_team=args.robots_per_team,
+                            waste_per_type=args.waste_per_type, seed=args.seed)
 

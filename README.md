@@ -68,7 +68,7 @@ Actions: two motor commands in `[-1, 1]`, along X and Y.
 Existing checkpoints were trained with the previous reward. Run `python robot_experiment.py train`
 to train a new policy with this reward.
 
-Success means `go=1` and distance to the target ≤ 0.25 m.
+Success means `go=1` and distance to the target ≤ 0.40 m.
 An episode lasts at most 2,000 steps, including waiting. Each step simulates 0.05 s.
 Waiting is learned, so small movements can remain before the go signal.
 
@@ -318,7 +318,7 @@ types = sensors["types"]                  # 0 plastic, 1 cardboard, 2 residual, 
 
 Without `--sorting`, the PPO input remains seven navigation values. There is
 one shared bottle. In two-robot mode both must reach within
-0.25 m of it with `go=1`. Each robot receives its success bonus once, then zero
+0.40 m of it with `go=1`. Each robot receives its success bonus once, then zero
 motor commands and reward while the other finishes. This differs from the
 historical single-robot evaluation task.
 
@@ -360,10 +360,10 @@ the simulator does not supply the hidden material directly to the policy.
 This is simulated semantic sensing, not learned image classification.
 
 After go, matching waste is automatically collected when the robot is within
-0.25 m and has identified it. Incompatible waste is automatically reported at
+0.40 m and has identified it. Incompatible waste is automatically reported at
 the first identification outside that radius. Both outcomes end the episode
 successfully with a +10 bonus, in addition to the existing navigation reward.
-Entering the 0.25 m radius of incompatible waste ends the episode as a failure
+Entering the 0.40 m radius of incompatible waste ends the episode as a failure
 with an extra -10 penalty. The limit is evaluated on the robot-center distance;
 it is a training objective, not a movement clamp. Timeouts are failures.
 Reporting is a programmed communication rule, not an additional learned action.
@@ -547,3 +547,84 @@ after training, select the new run with `--model`. Omit `--drone-model` to use a
 known target position. With the drone, all three robots wait for discovery; the
 drone recognizes every material as generic waste and then stops. The robot that
 identifies residual waste broadcasts material code 3, enabling a handoff to `robot_3`.
+
+## Configurable teams and multiple waste items
+
+The counts are specified in the order **plastic, cardboard, residual waste**.
+For three robots and six waste items in a single episode:
+
+```bash
+python robot_experiment.py train --sorting \
+  --robots-per-team 1 1 1 --waste-per-type 2 2 2 \
+  --steps 600000 --seed 0
+```
+
+To inspect the same scenario using an existing 76-input sorting policy:
+
+```bash
+python robot_experiment.py evaluate --sorting --render --episodes 10 \
+  --robots-per-team 1 1 1 --waste-per-type 2 2 2 \
+  --model models/ppo_sorting/runs/run_002/best_model.zip --seed 0
+```
+
+The same options work with `train --resume --model ...`. Each training start
+creates a new run and preserves the source checkpoint. Increase both team size
+and workload by setting `--robots-per-team 2 2 2 --waste-per-type 4 4 4`:
+this creates six robots and twelve waste items. Robot names are `robot`,
+`robot_2`, and so on, with plastic specialists first, then cardboard and residual
+specialists. Team colors remain yellow, blue and green.
+
+Both options enable configurable collection and require `--sorting`. If only
+`--waste-per-type` is supplied, the default is one robot per material (two with
+`--two-robots`). If only `--robots-per-team` is supplied, the default is one waste
+item for each represented material. Counts can be zero to isolate a team, for
+example `--robots-per-team 2 0 0 --waste-per-type 6 0 0`. Each enabled waste
+category needs a compatible robot. `--robots-per-team` replaces the fixed
+`--two-robots` and `--three-robots` flags.
+
+This first increment uses known waste positions and a **sequential programmed
+dispatcher**. One robot moves at a time. The dispatcher selects the remaining
+item closest to any robot, then assigns the closest available robot without
+revealing the material. The robot identifies its assigned item with its rays;
+if incompatible, it reports that item's material and transfers the task to the
+closest compatible robot. Visible unrelated waste does not overwrite the
+assigned item's material memory. After collection, the object disappears and
+the dispatcher starts another task. Assignment memory and completion flags
+are reset for the new task, while the episode and elapsed time continue.
+
+Success requires collecting **all** requested items within the existing 2,000
+world-step limit. Correct collection and an incompatible-item report retain
+their individual +10 rewards. The +10 team bonus is paid once, when the entire
+collection finishes, for teams with more than one robot. Passing near unrelated
+or incompatible waste does not fail a configurable collection episode: only a
+compatible robot can collect the assigned item. The fixed single-item modes
+retain their original wrong-radius failure rule.
+
+Waste items spawn at least 0.75 m apart and at least 0.75 m from each robot;
+robot spawns are at least 1 m apart. These clearances replace the fixed modes'
+3 m robot-to-target distance so several items can fit inside the same arena.
+Configurations that cannot be placed within the sampling budget raise an error.
+
+All robots share one policy with the existing 76-value input and two XY actions
+per robot. Increasing the counts does not change the input dimension. Existing
+checkpoints can be evaluated directly; performance on the larger workload must
+be measured separately. Multi-item collection currently runs without
+`--drone-model`: continuous drone search, simultaneous collection, multiple
+areas and carrying capacity remain later increments.
+
+`--seed` defaults to 0 and seeds training or stochastic evaluation. Evaluation
+uses a repeatable sequence of environment resets and policy actions, and prints
+both full-episode `success_rate` and `mean_collection_fraction`, which includes
+partial collections at timeout. Step info exposes `current_waste`,
+`collected_waste`, `reported_waste`, `collected_count`, `remaining_waste`,
+`total_waste`, `collection_fraction`, `waste_positions`, `waste_materials`,
+`waste_collected` and `known_waste_types`. True materials in info are diagnostic;
+the policy receives its assigned item's sensed or communicated material.
+
+`--steps` counts learning transitions by default. With six learning robots,
+each world step supplies six transitions, including those of waiting robots.
+Add `--worldsteps` to specify a budget in world steps, as in the clean/push
+examples; the training script converts it to learning transitions. PPO completes
+full rollouts, so the actual budget can exceed the requested count. The run's
+`config.json` records team counts, waste counts, seed, assignment rule, step
+unit, requested learning transitions and source checkpoint.

@@ -22,6 +22,8 @@ class RobotAgent:
         self.name = name
         prefix = "" if name == "robot" else f"{name}_"
         self.body_id = env.model.body(name).id
+        self.robot_index = env.robot_names.index(name)
+        self.geom_ids = np.flatnonzero(env.model.body_rootid[env.model.geom_bodyid] == self.body_id)
         self.geom_group = int(env.model.geom_group[env.model.body_geomadr[self.body_id]])
         self.visual_body_id = env.model.body(prefix + "robot_visual").id
         self.sensor_id = env.model.body(prefix + "robot_head_sensor").id
@@ -37,7 +39,7 @@ class RobotAgent:
         ])
         self.max_turn_speed = np.deg2rad(120.0)
         self.turn_response_time = 0.3
-        self.success_radius = 0.25
+        self.success_radius = 0.4
         self.robot_safe_distance = 0.8  # Center-to-center clearance, in metres.
         self.robot_proximity_weight = 2.0
         self.robot_collision_penalty = 10.0
@@ -45,12 +47,13 @@ class RobotAgent:
         self.observation_space = env.observation_space
         self.action_space = spaces.Box(-1.0, 1.0, shape=(2,), dtype=np.float32)
         self.ray_length = 2.0
-        # Each robot has its own geometry group; group 3 is the floor.
+        # Group 3 is the floor; group 5 temporarily excludes this robot's shell.
         geomgroup = np.ones(6, dtype=np.uint8)
-        geomgroup[self.geom_group] = 0
         geomgroup[3] = 0
+        geomgroup[5] = 0
         self.raycaster = Raycaster(
             env.model, env.data, {self.body_id: self.sensor_id}, geomgroup=geomgroup,
+            excluded_geom_ids=self.geom_ids,
         )
         # Three horizontal angles at each elevation: see robot bodies as well
         # as low waste objects, which a single horizontal fan would miss.
@@ -83,13 +86,22 @@ class RobotAgent:
         self.go = 0 if env.drone_active else int(self.go_delay == 0)
         self.completed = False
         self.specialization = int(env.np_random.integers(2)) if env.sorting else 0
-        if env.sorting and env.multi_robot:
-            self.specialization = env.robot_names.index(self.name)
+        if env.dispatching:
+            self.specialization = int(env.robot_roles[self.name])
         self.detected_type = -1
         if qpos is None:
             qpos = env.init_qpos.copy()
         position = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
-        if self.name == "robot":
+        if env.collection_mode:
+            previous = env.robot_names[:self.robot_index]
+            for _ in range(2000):
+                if all(np.linalg.norm(position - qpos[env.robots[name].qpos_indices]) >= 1.0
+                       for name in previous):
+                    break
+                position = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
+            else:
+                raise ValueError("Not enough room to spawn the requested robots; reduce team sizes")
+        elif self.name == "robot":
             env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
             while np.linalg.norm(env.target - position) < env.min_spawn_distance:
                 env.target = env.np_random.uniform(-env.spawn_half_size, env.spawn_half_size, size=2)
@@ -106,7 +118,7 @@ class RobotAgent:
         return qpos
 
     def control(self, action):
-        if self.env.sorting and self.env.multi_robot and self.name != self.env.active_robot:
+        if self.env.dispatching and self.name != self.env.active_robot:
             return np.zeros(2)
         # As in the thesis, ground-agent actions stay zero until detection.
         if self.env.drone_active and not self.env.shared_comm[0]:
@@ -182,7 +194,7 @@ class RobotAgent:
     def get_observation(self):
         # The robot only receives the target broadcast after drone detection.
         if self.env.drone_active:
-            if not (self.env.sorting and self.env.multi_robot):
+            if not self.env.dispatching:
                 self.go = int(bool(self.env.shared_comm[0]))
             relative_target = (
                 self.env.shared_comm[1:3] * self.env.drone.area_half_size - self.position
@@ -222,10 +234,10 @@ class RobotAgent:
         if self.env.sorting:
             compatible = self.specialization == self.env.target_type
             identified = self.detected_type >= 0
-            if not compatible and distance <= self.success_radius:
+            if not self.env.collection_mode and not compatible and distance <= self.success_radius:
                 # Entering the collection radius of the wrong waste is a failure.
                 return float(reward - 10), False, distance
-            if self.env.multi_robot and self.name != self.env.active_robot:
+            if self.env.dispatching and self.name != self.env.active_robot:
                 return 0.0, False, distance
             self.avoidance_reward = self.compute_avoidance_reward()
             reward += self.avoidance_reward
@@ -238,7 +250,7 @@ class RobotAgent:
             self.completed = True
 
         # The next action receives go=1 once the waiting period is over.
-        if not self.env.drone_active and not (self.env.sorting and self.env.multi_robot):
+        if not self.env.drone_active and not self.env.dispatching:
             self.go = int(self.env.steps >= self.go_delay)
         return float(reward), success, distance
 
@@ -250,12 +262,12 @@ class RobotAgent:
         distance = min(np.linalg.norm(self.position - robot.position) for robot in others)
         proximity = max(0.0, 1.0 - distance / self.robot_safe_distance)
         # Physics contacts, rather than semantic rays, establish actual collision.
-        other_groups = {robot.geom_group for robot in others}
+        owners = self.env.geom_robot_ids
         collision = any(
-            (int(self.env.model.geom_group[c.geom1]) == self.geom_group
-             and int(self.env.model.geom_group[c.geom2]) in other_groups)
-            or (int(self.env.model.geom_group[c.geom2]) == self.geom_group
-                and int(self.env.model.geom_group[c.geom1]) in other_groups)
+            (owners[c.geom1] == self.robot_index and owners[c.geom2] >= 0
+             and owners[c.geom2] != self.robot_index)
+            or (owners[c.geom2] == self.robot_index and owners[c.geom1] >= 0
+                and owners[c.geom1] != self.robot_index)
             for c in self.env.data.contact
         )
         return float(-self.robot_proximity_weight * proximity
@@ -268,7 +280,17 @@ class RobotAgent:
         self.ray_types.fill(len(self.ray_categories) - 1)
         hits = geomids >= 0
         self.ray_types[hits] = self.env.ray_geom_types[geomids[hits]]
-        seen = self.ray_types[self.ray_types < self.material_count]
+        if self.env.collection_mode:
+            # Other visible waste must not overwrite the assigned item's identity.
+            hits = self.ray_geomids >= 0
+            current_hits = np.zeros(self.ray_count, dtype=bool)
+            if self.env.current_waste is not None:
+                current_hits[hits] = (
+                    self.env.geom_waste_ids[self.ray_geomids[hits]] == self.env.current_waste
+                )
+            seen = self.ray_types[current_hits]
+        else:
+            seen = self.ray_types[self.ray_types < self.material_count]
         if seen.size:
             self.detected_type = int(seen[0])
 
@@ -283,7 +305,7 @@ class RobotAgent:
 
     def render_rays(self, viewer):
         colors = ((1.0, 0.8, 0.05, 1.0), (0.1, 0.75, 1.0, 1.0), (0.15, 0.9, 0.3, 1.0))
-        color = colors[self.env.robot_names.index(self.name)]
+        color = colors[self.specialization if self.env.sorting else self.robot_index % 3]
         self.raycaster.render_rays(self.body_id, self.ray_length, viewer, color)
 
 

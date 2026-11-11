@@ -5,11 +5,13 @@ import numpy as np
 
 
 class Raycaster:
-    def __init__(self, model, data, robot_indicator_mujoco_body_ids, geomgroup=None):
+    def __init__(self, model, data, robot_indicator_mujoco_body_ids, geomgroup=None,
+                 excluded_geom_ids=()):
         """Map each robot body ID to the body defining its sensor pose."""
         self.model = model
         self.data = data
         self.robot_indicator_mujoco_body_ids = dict(robot_indicator_mujoco_body_ids)
+        self.excluded_geom_ids = np.asarray(excluded_geom_ids, dtype=np.int32)
         self.raycast_rot_mats = {}
         self.raycast_local_dirs = {}
         self.raycast_ray_dirs_buf = {}
@@ -23,6 +25,8 @@ class Raycaster:
         )
         if self._raycast_geomgroup.shape != (6,):
             raise ValueError("geomgroup must contain six entries")
+        if self.excluded_geom_ids.size:
+            self._raycast_geomgroup[5] = 0
 
     def setup_raycast(self, robot_mujoco_body_id, nrays, angle_covered_degrees,
                       local_directions=None):
@@ -99,11 +103,17 @@ class Raycaster:
             ray_dirs[:, 2] = world_forward[2]
         # Unit directions make the returned values distances, not scaled fractions.
         # Each robot needs its own call because mj_multiRay uses a common origin.
-        mujoco.mj_multiRay(
-            self.model, self.data, ray_start, ray_dirs.reshape(-1),
-            self._raycast_geomgroup, True, -1, geomids, distances, None,
-            nrays, ray_length,
-        )
+        # Exclude the complete visual subtree without consuming a group per robot.
+        groups = self.model.geom_group[self.excluded_geom_ids].copy()
+        self.model.geom_group[self.excluded_geom_ids] = 5
+        try:
+            mujoco.mj_multiRay(
+                self.model, self.data, ray_start, ray_dirs.reshape(-1),
+                self._raycast_geomgroup, True, -1, geomids, distances, None,
+                nrays, ray_length,
+            )
+        finally:
+            self.model.geom_group[self.excluded_geom_ids] = groups
 
         # The cutoff culls distant geoms; enforce the exact ray segment as well.
         for i in range(nrays):
